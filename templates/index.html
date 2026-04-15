@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Majal 2.0 | منصة لغة مجال</title>
+    <style>
+        :root { --bg: #0B0B0B; --navy: #0A1F44; --gold: #64FFDA; --white: #E6F1FF; }
+        body { background: var(--bg); color: var(--white); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        header { background: var(--navy); padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
+        .container { display: flex; flex: 1; padding: 20px; gap: 20px; flex-direction: column; }
+        textarea { flex: 1; background: #112240; color: var(--gold); border: 1px solid var(--navy); border-radius: 10px; padding: 20px; font-size: 18px; font-family: monospace; outline: none; min-height: 200px; }
+        #output { flex: 1; background: #000; color: #00ff00; border-radius: 10px; padding: 20px; font-family: monospace; white-space: pre-wrap; border: 1px solid #333; min-height: 150px; overflow-y: auto; }
+        .controls { padding: 20px; text-align: center; }
+        button { background: var(--gold); color: var(--bg); border: none; padding: 15px 50px; font-size: 20px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.3s; width: 100%; }
+        button:hover { transform: scale(1.02); box-shadow: 0 0 15px var(--gold); }
+    </style>
+</head>
+<body>
+    <header><h1>MAJAL 2.0 <small>المحيط البرمجي</small></h1></header>
+    <div class="container">
+        <textarea id="code" placeholder="# اكتب كود مجال هنا..."></textarea>
+        <div id="output"># النتيجة ستظهر هنا...</div>
+    </div>
+    <div class="controls">
+        <button onclick="runCode()">تشغيل المحرك 🚀</button>
+    </div>
+    <script>
+        async function runCode() {
+            const code = document.getElementById('code').value;
+            const output = document.getElementById('output');
+            output.innerText = "جاري المعالجة...";
+            try {
+                const response = await fetch('/run', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({code: code})
+                });
+                const data = await response.json();
+                output.innerText = data.result;
+            } catch (e) { output.innerText = "❌ خطأ في الاتصال بالسيرفر"; }
+        }
+    </script>
+</body>
+</html>
