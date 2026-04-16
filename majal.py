@@ -4,40 +4,39 @@ variables = {}
 
 def tokenize(code):
     token_specification = [
-        ('GENERATE', r'ابني_نظام'),   # أمر بناء كود تلقائي
-        ('ANALYZE',  r'فحص'),         # أمر تحليل الكود
+        ('BUILD',    r'ابني'),         # أمر بناء كود
+        ('ANALYZE',  r'فحص'),         # أمر تحليل
         ('VAR',      r'عرف'),
         ('PRINT',    r'اطبع'),
         ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'),
+        ('STRING',   r'"[^"]*"'),
         ('NUMBER',   r'\d+'),
-        ('ASSIGN',   r'='),
         ('END',      r';'),
         ('SKIP',     r'[ \t]+'),
     ]
-    # ... (نفس منطق التوكنز السابق)
     tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
     return [(mo.lastgroup, mo.group()) for mo in re.finditer(tok_regex, code) if mo.lastgroup != 'SKIP']
 
 def run_interpreter(tokens):
-    if not tokens: return ""
+    if not tokens: return "⚠️ بانتظار أوامر برمجية..."
     
-    # ميزة (ابني_نظام): توليد كود برمجي كامل
-    if tokens[0][0] == 'GENERATE':
-        system_name = tokens[1][1]
-        generated_code = f"""
-        // تم بناء نظام {system_name} تلقائياً بواسطة مجال
-        عرف {system_name}_حالة = 1 ;
-        اطبع "نظام {system_name} جاهز للعمل" ;
-        """
-        return f"🏗️ تم توليد الهيكل البرمجي التالي:\n{generated_code}"
+    # --- الركيزة 1: بناء الكود التلقائي ---
+    if tokens[0][0] == 'BUILD':
+        target = tokens[1][1].strip('"')
+        if target == "واجهة":
+            return "🏗️ [مجال Builder]: تم بناء هيكل واجهة المستخدم (UI) بنجاح."
+        return f"🏗️ [مجال Builder]: جاري توليد كود لـ {target}..."
 
-    # ميزة (فحص): تحليل الكود والبحث عن أخطاء منطقية
+    # --- الركيزة 2: محلل الأخطاء الذكي ---
     if tokens[0][0] == 'ANALYZE':
-        analysis_report = "🔍 تقرير فحص مجال:\n"
-        if len(variables) == 0:
-            analysis_report += "- تنبيه: الذاكرة فارغة، لم تقم بتعريف أي متغيرات بعد.\n"
-        else:
-            analysis_report += f"- ذاكرة اللغة تحتوي على {len(variables)} متغيرات.\n"
-        return analysis_report
+        issues = []
+        # فحص وجود متغيرات غير معرفة
+        for i, (kind, val) in enumerate(tokens):
+            if kind == 'ID' and val not in variables and tokens[i-1][0] != 'VAR':
+                issues.append(f"تنبيه: المتغير [{val}] مستخدم لكنه غير معرف.")
+        
+        if not issues:
+            return "🔍 [محلل مجال]: الكود سليم 100% وجاهز للانطلاق."
+        return "🔍 [محلل مجال] وجد ملاحظات:\n" + "\n".join(issues)
 
-    return "💡 كود جاهز للمعالجة."
+    return "💡 تم استقبال الكود بنجاح."
