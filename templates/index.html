@@ -3,57 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAJAL 2.0 | المحيط البرمجي</title>
+    <title>MAJAL PRO | المحيط البرمجي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #050505; color: #e0e0e0; overflow-x: hidden; }
-        .editor-font { font-family: 'Fira Code', monospace; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #050505; color: #e0e0e0; }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .editor-font { font-family: 'Fira Code', monospace; }
         .terminal-scroll::-webkit-scrollbar { width: 6px; }
         .terminal-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        @keyframes pulse-border { 0% { border-color: #3b82f6; } 50% { border-color: #00d1ff; } 100% { border-color: #3b82f6; } }
-        .active-border { animation: pulse-border 2s infinite; border-width: 2px; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
-
     <div class="max-w-5xl mx-auto space-y-6">
         <header class="flex justify-between items-center border-b border-blue-900/50 pb-4">
-            <h1 class="text-2xl font-bold tracking-widest text-blue-500">MAJAL 2.0 <span class="text-xs text-gray-500 font-normal">بواسطة وسام</span></h1>
-            <div class="flex space-x-2 space-x-reverse">
-                <div class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_10px_yellow]"></div>
-                <div class="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_10px_green]"></div>
-            </div>
+            <h1 class="text-3xl font-bold tracking-tighter text-blue-500 italic">MAJAL <span class="text-white">PRO</span></h1>
+            <div class="text-xs text-gray-500">نظام بناء الأنظمة المتكامل</div>
         </header>
 
-        <div class="glass rounded-2xl overflow-hidden shadow-2xl active-border">
-            <textarea id="codeEditor" class="w-full h-80 bg-transparent p-6 editor-font text-blue-300 outline-none resize-none text-lg" placeholder="اكتب كود 'مجال' هنا..."></textarea>
+        <div class="glass rounded-2xl overflow-hidden shadow-2xl border-l-4 border-blue-600">
+            <textarea id="codeEditor" class="w-full h-80 bg-transparent p-6 editor-font text-blue-300 outline-none resize-none text-lg" placeholder="عرف الاسم = 'مستشفى الفخامة' ; &#10;ابني 'مستشفى' ;"></textarea>
         </div>
 
-        <div class="glass rounded-2xl p-4 h-64 overflow-y-auto terminal-scroll editor-font text-sm shadow-inner" id="output">
-            <div class="text-gray-500">// بانتظار إبداعك...</div>
+        <div class="glass rounded-2xl p-4 h-64 overflow-y-auto terminal-scroll editor-font text-sm" id="output">
+            <div class="text-gray-600">// بانتظار أوامر البناء...</div>
         </div>
 
-        <button onclick="runMajal()" class="w-full bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500 text-white font-bold py-5 rounded-2xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 flex items-center justify-center space-x-3 space-x-reverse text-lg">
-            <span>إطلاق المحرك 🚀</span>
+        <button onclick="runMajal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-5 rounded-2xl shadow-xl transition-all active:scale-95 flex items-center justify-center space-x-3 space-x-reverse">
+            <span class="text-xl">توليد النظام 🚀</span>
         </button>
     </div>
 
-    <div id="codeModal" class="fixed inset-0 bg-black/95 hidden z-50 p-4 md:p-10 flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-[#0a0f1e] w-full max-w-4xl max-h-[85vh] rounded-3xl border border-blue-500/50 shadow-[0_0_50px_rgba(59,130,246,0.2)] flex flex-col">
+    <div id="codeModal" class="fixed inset-0 bg-black/95 hidden z-50 p-6 flex items-center justify-center backdrop-blur-md">
+        <div class="bg-[#0a0f1e] w-full max-w-4xl max-h-[85vh] rounded-3xl border border-blue-500/50 shadow-2xl flex flex-col">
             <div class="p-5 border-b border-slate-800 flex justify-between items-center">
-                <div class="flex items-center space-x-3 space-x-reverse">
-                    <span class="text-2xl">📄</span>
-                    <h2 class="text-xl font-bold text-blue-400">الأكواد المولدة من "مَجال"</h2>
-                </div>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-3xl font-light">&times;</button>
+                <h2 class="text-xl font-bold text-blue-400">📄 كود النظام المولد جاهز للنسخ</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
             </div>
-            <pre id="generatedCodeArea" class="p-8 overflow-auto text-green-400 editor-font text-base whitespace-pre-wrap flex-1 leading-relaxed bg-black/40"></pre>
+            <pre id="generatedCodeArea" class="p-8 overflow-auto text-green-400 editor-font text-sm whitespace-pre-wrap flex-1 bg-black/50"></pre>
             <div class="p-5 border-t border-slate-800 flex justify-between items-center">
-                <p class="text-xs text-gray-500">جاهز للنسخ واللصق في مشروعك</p>
-                <button onclick="copyCode()" id="copyBtn" class="bg-blue-600 px-8 py-3 rounded-xl text-white font-bold hover:bg-blue-500 transition-colors shadow-lg">نسخ الكود 📋</button>
+                <button onclick="copyCode()" id="copyBtn" class="bg-blue-600 px-10 py-3 rounded-xl text-white font-bold hover:bg-blue-500 shadow-lg transition-all">نسخ الكود 📋</button>
             </div>
         </div>
     </div>
@@ -62,7 +51,7 @@
         async function runMajal() {
             const code = document.getElementById('codeEditor').value;
             const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = '<div class="text-blue-400 animate-pulse">🔍 جاري البناء والتحليل...</div>';
+            outputDiv.innerHTML = '<div class="text-blue-400 animate-pulse">🔍 جاري هندسة النظام...</div>';
 
             try {
                 const response = await fetch('/run', {
@@ -76,34 +65,25 @@
                 let formattedOutput = '';
 
                 lines.forEach(line => {
-                    if (line.includes('🚨') || line.includes('❌')) {
-                        formattedOutput += `<div class="bg-red-900/20 border-r-4 border-red-500 p-3 my-2 text-red-400 font-bold">${line}</div>`;
-                    } else if (line.includes('🏗️')) {
-                        // هنا السحر: جعل كود البناء قابل للضغط لفتح النافذة
-                        formattedOutput += `<div onclick="openModalWithContent()" class="bg-yellow-900/10 border-r-4 border-yellow-500 p-4 my-2 text-yellow-200 cursor-pointer hover:bg-yellow-900/20 transition-all group">
-                            <span class="flex justify-between items-center">${line} <span class="text-[10px] bg-yellow-500/20 px-2 py-1 rounded text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity">اضغط لعرض الكود 🖱️</span></span>
+                    if (line.includes('🏗️') || line.includes('🏥') || line.includes('🏦') || line.includes('🚀')) {
+                        formattedOutput += `<div onclick="openModal('${encodeURIComponent(data.result)}')" class="bg-blue-900/20 border-r-4 border-blue-500 p-4 my-2 text-blue-200 cursor-pointer hover:bg-blue-900/40 transition-all">
+                            ${line} <span class="text-[10px] text-blue-500 block mt-1">(اضغط هنا لنسخ الكود المولد 🖱️)</span>
                         </div>`;
-                        // تخزين الكود في متغير مؤقت لعرضه في الـ Modal
-                        window.lastGeneratedCode = data.result; 
-                    } else if (line.includes('🔍')) {
-                        formattedOutput += `<div class="bg-blue-900/20 border-r-4 border-blue-500 p-3 my-2 text-blue-300 font-medium">${line}</div>`;
                     } else if (line.includes('✅')) {
                         formattedOutput += `<div class="text-green-400 p-1 font-bold">● ${line}</div>`;
                     } else {
                         formattedOutput += `<div class="text-gray-400 p-1">${line}</div>`;
                     }
                 });
-
                 outputDiv.innerHTML = formattedOutput;
             } catch (err) {
-                outputDiv.innerHTML = `<div class="text-red-500">❌ فشل الاتصال بالمحرك</div>`;
+                outputDiv.innerHTML = `<div class="text-red-500 text-center">❌ خطأ في الاتصال بالمحرك</div>`;
             }
         }
 
-        function openModalWithContent() {
-            const codeArea = document.getElementById('generatedCodeArea');
-            // استخراج كود البناء فقط وتجميله
-            codeArea.innerText = window.lastGeneratedCode;
+        function openModal(encodedCode) {
+            const decodedCode = decodeURIComponent(encodedCode);
+            document.getElementById('generatedCodeArea').innerText = decodedCode;
             document.getElementById('codeModal').classList.remove('hidden');
         }
 
@@ -115,7 +95,7 @@
             const code = document.getElementById('generatedCodeArea').innerText;
             navigator.clipboard.writeText(code);
             const btn = document.getElementById('copyBtn');
-            btn.innerText = "تم النسخ! ✅";
+            btn.innerText = "تم النسخ بنجاح! ✅";
             setTimeout(() => { btn.innerText = "نسخ الكود 📋"; }, 2000);
         }
     </script>
