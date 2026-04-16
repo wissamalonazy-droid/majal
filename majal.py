@@ -4,39 +4,62 @@ variables = {}
 
 def tokenize(code):
     token_specification = [
-        ('BUILD',    r'ابني'),         # أمر بناء كود
-        ('ANALYZE',  r'فحص'),         # أمر تحليل
+        ('BUILD',    r'ابني'),
+        ('ANALYZE',  r'فحص'),
         ('VAR',      r'عرف'),
         ('PRINT',    r'اطبع'),
         ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'),
-        ('STRING',   r'"[^"]*"'),
         ('NUMBER',   r'\d+'),
+        ('ASSIGN',   r'='),
+        ('PLUS',     r'\+'),
         ('END',      r';'),
         ('SKIP',     r'[ \t]+'),
+        ('NEWLINE',  r'\n'),
     ]
     tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
-    return [(mo.lastgroup, mo.group()) for mo in re.finditer(tok_regex, code) if mo.lastgroup != 'SKIP']
+    return [(mo.lastgroup, mo.group()) for mo in re.finditer(tok_regex, code) if mo.lastgroup not in ['SKIP', 'NEWLINE']]
 
 def run_interpreter(tokens):
+    global variables
     if not tokens: return "⚠️ بانتظار أوامر برمجية..."
     
-    # --- الركيزة 1: بناء الكود التلقائي ---
-    if tokens[0][0] == 'BUILD':
-        target = tokens[1][1].strip('"')
-        if target == "واجهة":
-            return "🏗️ [مجال Builder]: تم بناء هيكل واجهة المستخدم (UI) بنجاح."
-        return f"🏗️ [مجال Builder]: جاري توليد كود لـ {target}..."
+    results = []
+    # تقسيم التوكنز إلى جمل برمجية بناءً على الفاصلة المنقوطة (;)
+    statements = []
+    current_statement = []
+    for token in tokens:
+        current_statement.append(token)
+        if token[0] == 'END':
+            statements.append(current_statement)
+            current_statement = []
 
-    # --- الركيزة 2: محلل الأخطاء الذكي ---
-    if tokens[0][0] == 'ANALYZE':
-        issues = []
-        # فحص وجود متغيرات غير معرفة
-        for i, (kind, val) in enumerate(tokens):
-            if kind == 'ID' and val not in variables and tokens[i-1][0] != 'VAR':
-                issues.append(f"تنبيه: المتغير [{val}] مستخدم لكنه غير معرف.")
-        
-        if not issues:
-            return "🔍 [محلل مجال]: الكود سليم 100% وجاهز للانطلاق."
-        return "🔍 [محلل مجال] وجد ملاحظات:\n" + "\n".join(issues)
+    for stmt in statements:
+        try:
+            # --- منطق الفحص (الركيزة الأساسية) ---
+            if stmt[0][0] == 'ANALYZE':
+                issues = []
+                # فحص المتغيرات المستخدمة في كامل الكود
+                for s in statements:
+                    for i, (kind, val) in enumerate(s):
+                        if kind == 'ID' and val not in variables and s[max(0, i-1)][0] != 'VAR':
+                            issues.append(f"تنبيه: المتغير [{val}] استخدمته بس ما عرفته!")
+                
+                if not issues:
+                    results.append("🔍 [محلل مجال]: الكود سليم ومنطقي.")
+                else:
+                    results.append("🔍 [محلل مجال] وجد أخطاء:\n" + "\n".join(set(issues)))
 
-    return "💡 تم استقبال الكود بنجاح."
+            # --- منطق التعريف ---
+            elif stmt[0][0] == 'VAR':
+                var_name = stmt[1][1]
+                variables[var_name] = float(stmt[3][1])
+                results.append(f"✅ تم تعريف {var_name}")
+
+            # --- منطق البناء ---
+            elif stmt[0][0] == 'BUILD':
+                results.append(f"🏗️ [بناء مجال]: جاري إنشاء هيكل لـ {stmt[1][1]}")
+
+        except Exception as e:
+            results.append(f"❌ خطأ في السطر: {str(e)}")
+
+    return "\n".join(results) if results else "💡 تم استقبال الكود."
