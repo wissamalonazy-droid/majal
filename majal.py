@@ -1,11 +1,11 @@
 import re
 
-# ذاكرة اللغة لتخزين المتغيرات
+# ذاكرة اللغة
 variables = {}
 
 def tokenize(code):
     token_specification = [
-        ('IF',       r'إذا'),          # أمر الشرط الجديد
+        ('IF',       r'إذا'),          
         ('BUILD',    r'ابني'),         
         ('VAR',      r'عرف'),          
         ('PRINT',    r'اطبع'),         
@@ -13,19 +13,20 @@ def tokenize(code):
         ('NUMBER',   r'\d+(\.\d+)?'),  
         ('STRING',   r'"[^"]*"'),      
         ('ASSIGN',   r'='),            
-        ('GT',       r'>'),            # أكبر من
-        ('LT',       r'<'),            # أصغر من
-        ('EQ',       r'=='),           # يساوي
+        ('GT',       r'>'),            
+        ('LT',       r'<'),            
+        ('EQ',       r'=='),           
         ('END',      r';'),            
         ('SKIP',     r'[ \t]+'),       
         ('NEWLINE',  r'\n'),           
     ]
     tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
+    # الفلترة هنا صارت أقوى عشان ما يضرب الكود مع الرموز
     return [(mo.lastgroup, mo.group()) for mo in re.finditer(tok_regex, code) if mo.lastgroup not in ['SKIP', 'NEWLINE']]
 
 def run_interpreter(tokens):
     global variables
-    if not tokens: return "⚠️ محرك مَجال 2.0.1 جاهز للعمل..."
+    if not tokens: return "⚠️ المحرك بانتظار أوامرك..."
     
     results = []
     statements = []
@@ -41,41 +42,36 @@ def run_interpreter(tokens):
         try:
             cmd = stmt[0][0]
 
-            # 1️⃣ المنطق الشرطي (القرار الذكي)
             if cmd == 'IF':
-                # هيكل الأمر: إذا [متغير] [علامة] [رقم] [أمر] [نص] ;
                 var_name = stmt[1][1]
                 op = stmt[2][0]
                 threshold = float(stmt[3][1])
-                action = stmt[4][0] # PRINT
+                # تأكد من وجود أمر بعد الشرط
+                action = stmt[4][0]
                 message = stmt[5][1].strip('"')
-
-                val = float(variables.get(var_name, 0))
                 
-                check = False
-                if op == 'GT': check = val > threshold
-                elif op == 'LT': check = val < threshold
-                elif op == 'EQ': check = val == threshold
+                val = float(variables.get(var_name, 0))
+                check = (val > threshold if op == 'GT' else val < threshold if op == 'LT' else val == threshold)
 
                 if check:
-                    results.append(f"🎯 [منطق مَجال]: تحقق الشرط -> {message}")
+                    results.append(f"🎯 [منطق]: {message}")
                 else:
-                    results.append(f"⚪ [منطق مَجال]: لم يتحقق الشرط.")
+                    results.append(f"⚪ [منطق]: لم يتحقق الشرط.")
 
-            # 2️⃣ نظام البناء الشامل
             elif cmd == 'BUILD':
                 sys_type = stmt[1][1].strip('"')
                 name = str(variables.get("الاسم", "نظام مَجال")).strip('"')
                 currency = str(variables.get("العملة", "SAR")).strip('"')
 
                 if sys_type == "متجر":
-                    results.append(f"🏗️ [بناء]: تم توليد كود متجر ({name}) بالعملة ({currency}) جاهز للنسخ.")
+                    results.append(f"🏗️ [بناء]: تم إنشاء متجر {name} ({currency})")
+                elif sys_type == "مستشفى":
+                    results.append(f"🏥 [بناء]: تم إنشاء هيكل (مستشفى) لـ {name}")
                 elif sys_type == "بنك":
-                    results.append(f"🏦 [بناء]: تم هندسة النظام البنكي لـ ({name}) بأعلى معايير الأمان.")
+                    results.append(f"🏦 [بناء]: تم هندسة نظام {name} البنكي")
                 else:
-                    results.append(f"📦 [بناء]: تم إنشاء هيكل ({sys_type}) مخصص.")
+                    results.append(f"📦 [بناء]: تم بناء نظام {sys_type} مخصص")
 
-            # 3️⃣ تعريف المتغيرات والطباعة
             elif cmd == 'VAR':
                 variables[stmt[1][1]] = stmt[3][1]
                 results.append(f"✅ تم حفظ [{stmt[1][1]}]")
@@ -85,6 +81,6 @@ def run_interpreter(tokens):
                 results.append(str(variables.get(target, target)).strip('"'))
 
         except Exception as e:
-            results.append(f"❌ خطأ منطقي: {str(e)}")
+            results.append(f"❌ خطأ في السطر: تأكد من صياغة الأمر")
     
     return "\n".join(results)
