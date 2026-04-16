@@ -35,6 +35,21 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 20px -10px #2563eb;
         }
+        /* حركة النص البرتقالي */
+        .magic-text {
+            color: #fb923c; /* لون برتقالي فخم */
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-block;
+            padding: 5px 15px;
+            border: 1px dashed #fb923c;
+            border-radius: 10px;
+        }
+        .magic-text:hover {
+            background: rgba(251, 146, 60, 0.1);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body class="p-6 md:p-12">
@@ -52,11 +67,11 @@
         </div>
 
         <div class="pro-card p-2">
-            <textarea id="codeEditor" class="w-full h-80 p-8 editor-area text-blue-400 text-xl outline-none resize-none" placeholder="// أدخل أوامر مَجال البرمجية هنا..."></textarea>
+            <textarea id="codeEditor" class="w-full h-80 p-8 editor-area text-blue-400 text-xl outline-none resize-none" placeholder="// أدخل أوامر مَجال البرمجية هنا يا وسام..."></textarea>
         </div>
 
-        <div id="output" class="pro-card p-6 min-h-[120px] border-r-4 border-blue-500 bg-slate-900/40 text-sm leading-relaxed overflow-hidden">
-            <span class="text-slate-500 italic">// بانتظار إشارة البدء...</span>
+        <div id="output" class="pro-card p-8 min-h-[120px] border-r-4 border-blue-500 bg-slate-900/40 text-sm leading-relaxed overflow-hidden flex items-center justify-center">
+            <span class="text-slate-500 italic">// المحرك مستعد للبناء...</span>
         </div>
 
         <button onclick="runMajal()" class="w-full btn-grad py-5 rounded-2xl font-bold text-xl tracking-widest uppercase flex items-center justify-center space-x-4 space-x-reverse">
@@ -65,14 +80,14 @@
         </button>
     </div>
 
-    <div id="copyModal" class="fixed inset-0 bg-slate-950/95 hidden z-50 flex flex-col p-6 md:p-12 backdrop-blur-xl">
+    <div id="copyModal" class="fixed inset-0 bg-slate-950/98 hidden z-50 flex flex-col p-6 md:p-12 backdrop-blur-2xl">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold text-blue-400">📄 الكود المولد</h2>
+            <h2 class="text-2xl font-black text-blue-400 italic tracking-widest">ARCHITECTURE CODE</h2>
             <button onclick="closeModal()" class="text-slate-400 hover:text-white text-4xl">&times;</button>
         </div>
-        <pre id="modalText" class="bg-black/50 p-8 rounded-3xl border border-white/10 flex-1 overflow-auto text-emerald-400 font-mono text-lg whitespace-pre-wrap"></pre>
+        <pre id="modalText" class="bg-black/80 p-8 rounded-[2rem] border border-white/5 flex-1 overflow-auto text-blue-400 font-mono text-base whitespace-pre-wrap shadow-inner"></pre>
         <div class="mt-8 flex justify-center">
-            <button onclick="copyBtn()" id="copyBtn" class="bg-white text-black px-12 py-4 rounded-2xl font-black text-lg hover:bg-blue-500 hover:text-white transition-all">نسخ الكود 📋</button>
+            <button onclick="copyAction()" id="copyBtn" class="bg-blue-600 text-white px-16 py-5 rounded-2xl font-black text-xl hover:bg-blue-500 transition-all shadow-xl shadow-blue-900/40 active:scale-95">نسخ الكود 📋</button>
         </div>
     </div>
 
@@ -80,7 +95,10 @@
         async function runMajal() {
             const code = document.getElementById('codeEditor').value;
             const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = '<div class="flex items-center space-x-2 space-x-reverse"><div class="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div><span class="text-blue-400">جاري الهندسة...</span></div>';
+            
+            if(!code.trim()) return;
+
+            outputDiv.innerHTML = '<div class="animate-pulse text-blue-400 font-bold tracking-widest">🔄 جاري معالجة أوامر وسام...</div>';
             
             try {
                 const response = await fetch('/run', {
@@ -90,27 +108,56 @@
                 });
                 const data = await response.json();
                 
+                // الحركة اللي تبيها: النص البرتقالي اللي يفتح الكود
                 outputDiv.innerHTML = `
-                    <div onclick="openModal('${encodeURIComponent(data.result)}')" class="cursor-pointer group relative">
-                        <pre class="text-slate-200">${data.result}</pre>
-                        <div class="absolute top-0 left-0 bg-blue-500/10 px-2 py-1 rounded text-[10px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">انقر للنسخ 🖱️</div>
+                    <div class="text-center">
+                        <span onclick="openModal(\`${encodeURIComponent(data.result)}\`)" class="magic-text uppercase tracking-widest text-lg">
+                            ✨ تم بناء التصور بنجاح.. اضغط هنا لاستعراض الكود ✨
+                        </span>
                     </div>`;
-            } catch (e) { outputDiv.innerHTML = '<span class="text-red-500">❌ خطأ في النظام</span>'; }
+            } catch (e) { 
+                outputDiv.innerHTML = '<span class="text-red-500 font-bold">❌ فشل في الاتصال بالسيرفر</span>'; 
+            }
         }
 
-        function openModal(c) {
-            document.getElementById('modalText').innerText = decodeURIComponent(c);
+        function openModal(encoded) {
+            const decoded = decodeURIComponent(encoded);
+            document.getElementById('modalText').innerText = decoded;
             document.getElementById('copyModal').classList.remove('hidden');
+            const btn = document.getElementById('copyBtn');
+            btn.innerText = "نسخ الكود 📋";
+            btn.className = "bg-blue-600 text-white px-16 py-5 rounded-2xl font-black text-xl hover:bg-blue-500 transition-all shadow-xl shadow-blue-900/40 active:scale-95";
         }
 
-        function closeModal() { document.getElementById('copyModal').classList.add('hidden'); }
+        function closeModal() { 
+            document.getElementById('copyModal').classList.add('hidden'); 
+        }
 
-        function copyBtn() {
+        // دالة النسخ الاحترافية لجميع الأجهزة
+        async function copyAction() {
             const text = document.getElementById('modalText').innerText;
-            navigator.clipboard.writeText(text);
             const btn = document.getElementById('copyBtn');
-            btn.innerText = "تم الحفظ في الحافظة! ✅";
-            setTimeout(() => { btn.innerText = "نسخ الكود 📋"; }, 2000);
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                btn.innerText = "تم النسخ بنجاح! ✅";
+                btn.style.backgroundColor = "#10b981";
+            } catch (err) {
+                // طريقة احتياطية
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                btn.innerText = "تم النسخ بنجاح! ✅";
+                btn.style.backgroundColor = "#10b981";
+            }
+            
+            setTimeout(() => {
+                btn.innerText = "نسخ الكود 📋";
+                btn.style.backgroundColor = "#2563eb";
+            }, 2000);
         }
     </script>
 </body>
