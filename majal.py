@@ -1,26 +1,25 @@
 import re
 
+# ذاكرة اللغة (لتعريف المتغيرات)
 variables = {}
 
 def tokenize(code):
     token_specification = [
-        ('NUMBER',   r'\d+(\.\d+)?'),
-        ('STRING',   r'"[^"]*"'),
-        ('PRINT',    r'اطبع'),
-        ('VAR',      r'عرف'),
-        ('ASSIGN',   r'='),
-        ('PLUS',     r'\+'), # علامة الجمع
-        ('MINUS',    r'\-'), # علامة الطرح
-        ('END',      r';'),
-        ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'),
-        ('SKIP',     r'[ \t]+'),
+        ('NUMBER',   r'\d+(\.\d+)?'),       # الأرقام
+        ('STRING',   r'"[^"]*"'),           # النصوص
+        ('PRINT',    r'اطبع'),              # أمر الطباعة
+        ('PLUS',     r'\+'),                # علامة الجمع
+        ('END',      r';'),                 # نهاية السطر
+        ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), # أسماء المتغيرات
+        ('SKIP',     r'[ \t]+'),            # مسافات
+        ('NEWLINE',  r'\n'),                # سطر جديد
     ]
     tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
     tokens = []
     for mo in re.finditer(tok_regex, code):
         kind = mo.lastgroup
         value = mo.group()
-        if kind == 'SKIP': continue
+        if kind == 'SKIP' or kind == 'NEWLINE': continue
         tokens.append((kind, value))
     return tokens
 
@@ -29,30 +28,32 @@ def run_interpreter(tokens):
     if not tokens: return ""
     
     try:
-        # --- تطوير أمر (عرف) ليدعم الحساب البسيط ---
-        if tokens[0][0] == 'VAR':
-            var_name = tokens[1][1]
-            
-            # إذا كان الأمر: عرف س = 10 + 20 ;
-            if len(tokens) >= 6 and tokens[4][0] == 'PLUS':
-                val1 = float(tokens[3][1])
-                val2 = float(tokens[5][1])
-                result = val1 + val2
-                variables[var_name] = result
-                return f"✅ تم الحساب: {var_name} أصبح {result}"
-            
-            # إذا كان تعريف عادي: عرف س = 10 ;
-            else:
-                variables[var_name] = tokens[3][1]
-                return f"✅ تم حفظ {var_name}"
-
-        # --- أمر (اطبع) ---
+        # --- منطق أمر (اطبع) ---
         if tokens[0][0] == 'PRINT':
+            
+            # 1. حالة الحساب الديناميكي (رقم + رقم)
+            # نتحقق لو السطر فيه: اطبع | رقم | + | رقم | ;
+            if len(tokens) >= 5 and tokens[2][0] == 'PLUS':
+                if tokens[1][0] == 'NUMBER' and tokens[3][0] == 'NUMBER':
+                    # تحويل النصوص لأرقام حقيقية
+                    num1 = float(tokens[1][1])
+                    num2 = float(tokens[3][1])
+                    result = num1 + num2
+                    # إرجاع النص النهائي للمستخدم
+                    return f"🔢 لغة مجال تقول: ناتج {num1} + {num2} يساوي ({result})"
+            
+            # 2. حالة طباعة نص عادي " "
+            if tokens[1][0] == 'STRING':
+                return tokens[1][1].strip('"')
+            
+            # 3. حالة طباعة متغير من الذاكرة
             target = tokens[1][1]
-            if tokens[1][0] == 'STRING': return target.strip('"')
-            if target in variables: return str(variables[target])
-            return f"❌ {target} غير معرف"
+            if target in variables:
+                return f"قيمة {target} هي: {variables[target]}"
+            
+            # افتراضي: طباعة القيمة كما هي
+            return tokens[1][1]
 
-        return "💡 كود سليم"
+        return "💡 تم تحليل الكود."
     except Exception as e:
-        return f"❌ خطأ: {str(e)}"
+        return f"❌ خطأ تقني في المعالج: {str(e)}"
