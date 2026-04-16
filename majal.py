@@ -1,25 +1,25 @@
 import re
 
-# ذاكرة اللغة لتخزين المتغيرات
+# ذاكرة اللغة لتخزين المتغيرات (Storage)
 variables = {}
 
 def tokenize(code):
     token_specification = [
-        ('BUILD',    r'ابني'),         # أمر بناء الأنظمة
-        ('ANALYZE',  r'فحص'),         # أمر تحليل الكود
-        ('VAR',      r'عرف'),          # تعريف المتغيرات
-        ('PRINT',    r'اطبع'),         # الطباعة
-        ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), # الأسماء العربية والانجليزية
-        ('NUMBER',   r'\d+(\.\d+)?'),  # الأرقام الصحيحة والعشرية
-        ('STRING',   r'"[^"]*"'),      # النصوص بين علامات تنصيص
-        ('ASSIGN',   r'='),            # علامة المساواة
-        ('PLUS',     r'\+'),           # الجمع
-        ('MINUS',    r'-'),           # الطرح
-        ('MULT',     r'\*'),           # الضرب
-        ('DIV',      r'/'),            # القسمة
-        ('END',      r';'),            # نهاية السطر البرمجي
-        ('SKIP',     r'[ \t]+'),       # المسافات (تجاهل)
-        ('NEWLINE',  r'\n'),           # سطر جديد (تجاهل)
+        ('BUILD',    r'ابني'),         
+        ('ANALYZE',  r'فحص'),         
+        ('VAR',      r'عرف'),          
+        ('PRINT',    r'اطبع'),         
+        ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), 
+        ('NUMBER',   r'\d+(\.\d+)?'),  
+        ('STRING',   r'"[^"]*"'),      
+        ('ASSIGN',   r'='),            
+        ('PLUS',     r'\+'),           
+        ('MINUS',    r'-'),           
+        ('MULT',     r'\*'),           
+        ('DIV',      r'/'),            
+        ('END',      r';'),            
+        ('SKIP',     r'[ \t]+'),       
+        ('NEWLINE',  r'\n'),           
     ]
     tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
     return [(mo.lastgroup, mo.group()) for mo in re.finditer(tok_regex, code) if mo.lastgroup not in ['SKIP', 'NEWLINE']]
@@ -32,7 +32,6 @@ def run_interpreter(tokens):
     statements = []
     current_stmt = []
     
-    # تقسيم التوكنز إلى جمل برمجية بناءً على الفاصلة المنقوطة (;)
     for t in tokens:
         current_stmt.append(t)
         if t[0] == 'END':
@@ -43,77 +42,99 @@ def run_interpreter(tokens):
         try:
             cmd = stmt[0][0]
 
-            # 1️⃣ نظام البناء الشامل (من الألف إلى الياء)
+            # 1️⃣ نظام البناء الديناميكي (بناء أي متجر يطلبه المبرمج)
             if cmd == 'BUILD':
                 sys_type = stmt[1][1].strip('"')
+                
+                # جلب اسم المتجر من الذاكرة (إذا عرفه المبرمج) أو استخدام اسم افتراضي
+                raw_name = variables.get("اسم_المتجر", "SUHAIL ELUCE")
+                store_name = str(raw_name).strip('"')
+
                 if sys_type == "متجر":
                     results.append(f"""
-🚀 [نظام مجال الشامل]: تم توليد مشروع متجر كامل:
+🚀 [نظام مجال الشامل]: تم توليد مشروع متكامل لـ ({store_name}) من الألف إلى الياء:
 
 1. واجهة المستخدم (HTML/Tailwind):
 --------------------------------------------------
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{store_name}</title>
+</head>
 <body class="bg-[#0b0b0b] text-white">
-    <nav class="p-8 border-b border-blue-900 flex justify-between">
-        <h1 class="text-3xl font-bold">SUHAIL ELUCE</h1>
-        <ul class="flex gap-6"><li>الرئيسية</li><li>المتجر</li></ul>
+    <nav class="p-8 border-b border-blue-900 flex justify-between items-center">
+        <h1 class="text-3xl font-black text-blue-500 uppercase">{store_name}</h1>
+        <ul class="flex gap-8 text-lg font-bold">
+            <li class="hover:text-blue-400 cursor-pointer">الرئيسية</li>
+            <li class="hover:text-blue-400 cursor-pointer">منتجاتنا</li>
+            <li class="bg-blue-600 px-4 py-1 rounded-lg">السلة</li>
+        </ul>
     </nav>
-    <div class="p-12 grid grid-cols-1 md:grid-cols-3 gap-10">
-        <div class="bg-gray-900 p-6 rounded-3xl border border-gray-800">
-            <div class="h-64 bg-blue-900/20 rounded-xl mb-4"></div>
-            <h2 class="text-xl">عطر Sadeem</h2>
-            <p class="text-blue-400 font-bold">450 SAR</p>
-            <button class="w-full bg-blue-600 py-3 rounded-xl mt-4">شراء</button>
+    <main class="p-12 text-center">
+        <h2 class="text-5xl font-extrabold mb-10">مرحباً بكم في {store_name}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+             <div class="bg-gray-900 p-8 rounded-[40px] border border-gray-800 shadow-2xl transition-transform hover:scale-105">
+                <div class="h-64 bg-gradient-to-br from-blue-900 to-black rounded-3xl mb-6"></div>
+                <h3 class="text-2xl font-bold">المنتج الأول</h3>
+                <p class="text-blue-400 mt-2 font-mono text-xl">السعر حسب الطلب</p>
+                <button class="w-full bg-blue-600 mt-8 py-4 rounded-2xl font-black tracking-widest uppercase hover:bg-blue-500">أضف للسلة</button>
+             </div>
         </div>
-    </div>
+    </main>
 </body>
+</html>
 
-2. قاعدة البيانات (SQL):
+2. قاعدة البيانات المنظمة (SQL):
 --------------------------------------------------
-CREATE TABLE products (id INT, name TEXT, price FLOAT);
-CREATE TABLE orders (id INT, total FLOAT, status TEXT);
+CREATE TABLE {store_name.replace(' ', '_')}_products (id INT, name VARCHAR(100), price FLOAT);
+CREATE TABLE {store_name.replace(' ', '_')}_orders (id INT, total_amount FLOAT, date TIMESTAMP);
 
-3. منطق العمليات (Backend):
+3. ملف الإعدادات (JSON):
 --------------------------------------------------
-- نظام الدفع: Checkout API موصل بمدى.
-- الحماية: تم تفعيل تشفير SSL للمتجر.
+{{
+    "project_name": "{store_name}",
+    "owner": "Wesam",
+    "currency": "SAR",
+    "status": "Ready for Deployment"
+}}
 --------------------------------------------------
                     """)
                 elif sys_type == "مدرسة":
-                    results.append("🏗️ [مصنع مجال]: تم بناء نظام إدارة تعليمي شامل (طلاب، مدرسين، درجات).")
+                    results.append(f"🏗️ [مصنع مجال]: تم بناء نظام إدارة تعليمي كامل لـ ({store_name}).")
                 else:
-                    results.append(f"🏗️ [مصنع مجال]: جاري توليد هيكل مخصص لـ {sys_type}...")
+                    results.append(f"🏗️ [مصنع مجال]: جاري بناء نظام {sys_type} مخصص...")
 
-            # 2️⃣ المحلل الذكي وكاشف الأخطاء
+            # 2️⃣ المحلل الذكي
             elif cmd == 'ANALYZE':
                 issues = []
                 for s in statements:
                     for i, t in enumerate(s):
                         if t[0] == 'ID' and t[1] not in variables and s[max(0, i-1)][0] != 'VAR':
-                            issues.append(f"تنبيه: المتغير [{t[1]}] لم يتم تعريفه!")
+                            issues.append(f"تنبيه: المتغير [{t[1]}] مفقود من الذاكرة.")
                         if t[0] == 'DIV' and i+1 < len(s) and s[i+1][1] == '0':
                             issues.append("🚨 خطر: اكتشفنا محاولة قسمة على صفر!")
                 
                 results.append("🔍 [محلل مجال]: انتهى الفحص.")
                 if issues: results.append("\n".join(set(issues)))
-                else: results.append("✅ الكود سليم وجاهز للإطلاق.")
+                else: results.append("✅ الكود سليم واحترافي.")
 
-            # 3️⃣ الأوامر الأساسية (تعريف، طباعة)
+            # 3️⃣ تعريف المتغيرات (دعم النصوص والأرقام)
             elif cmd == 'VAR':
-                variables[stmt[1][1]] = float(stmt[3][1])
-                results.append(f"✅ تم حفظ المتغير [{stmt[1][1]}]")
+                var_name = stmt[1][1]
+                var_value = stmt[3][1]
+                # تخزين القيمة (سواء كانت نصاً أو رقماً)
+                variables[var_name] = var_value
+                results.append(f"✅ تم حفظ [{var_name}] في الذاكرة.")
 
             elif cmd == 'PRINT':
-                if len(stmt) >= 4:
-                    v1 = variables.get(stmt[1][1], float(stmt[1][1])) if stmt[1][0] in ['ID','NUMBER'] else 0
-                    v2 = variables.get(stmt[3][1], float(stmt[3][1])) if stmt[3][0] in ['ID','NUMBER'] else 0
-                    op = stmt[2][0]
-                    if op == 'PLUS': results.append(f"🔢 الناتج: {v1 + v2}")
-                    elif op == 'MULT': results.append(f"🔢 الناتج: {v1 * v2}")
-                    elif op == 'DIV': results.append(f"🔢 الناتج: {v1 / v2}" if v2 != 0 else "❌ خطأ")
+                target = stmt[1][1]
+                if target in variables:
+                    results.append(str(variables[target]).strip('"'))
                 else:
-                    results.append(stmt[1][1].strip('"'))
+                    results.append(target.strip('"'))
 
         except Exception as e:
-            results.append(f"❌ خطأ في تنفيذ السطر: {str(e)}")
+            results.append(f"❌ خطأ: {str(e)}")
     
     return "\n".join(results)
