@@ -5,18 +5,17 @@ variables = {}
 
 def tokenize(code):
     token_specification = [
+        ('IF',       r'إذا'),          # أمر الشرط الجديد
         ('BUILD',    r'ابني'),         
-        ('ANALYZE',  r'فحص'),         
         ('VAR',      r'عرف'),          
         ('PRINT',    r'اطبع'),         
         ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), 
         ('NUMBER',   r'\d+(\.\d+)?'),  
         ('STRING',   r'"[^"]*"'),      
         ('ASSIGN',   r'='),            
-        ('PLUS',     r'\+'),           
-        ('MINUS',    r'-'),           
-        ('MULT',     r'\*'),           
-        ('DIV',      r'/'),            
+        ('GT',       r'>'),            # أكبر من
+        ('LT',       r'<'),            # أصغر من
+        ('EQ',       r'=='),           # يساوي
         ('END',      r';'),            
         ('SKIP',     r'[ \t]+'),       
         ('NEWLINE',  r'\n'),           
@@ -26,7 +25,7 @@ def tokenize(code):
 
 def run_interpreter(tokens):
     global variables
-    if not tokens: return "⚠️ محرك مَجال بانتظار أوامر البناء الذكية..."
+    if not tokens: return "⚠️ محرك مَجال 2.0.1 جاهز للعمل..."
     
     results = []
     statements = []
@@ -42,62 +41,50 @@ def run_interpreter(tokens):
         try:
             cmd = stmt[0][0]
 
-            # 1️⃣ مصنع الأنظمة الاحترافي (Multitasking Engine)
-            if cmd == 'BUILD':
-                sys_type = stmt[1][1].strip('"')
+            # 1️⃣ المنطق الشرطي (القرار الذكي)
+            if cmd == 'IF':
+                # هيكل الأمر: إذا [متغير] [علامة] [رقم] [أمر] [نص] ;
+                var_name = stmt[1][1]
+                op = stmt[2][0]
+                threshold = float(stmt[3][1])
+                action = stmt[4][0] # PRINT
+                message = stmt[5][1].strip('"')
+
+                val = float(variables.get(var_name, 0))
                 
-                # جلب المتغيرات المخصصة من الذاكرة (الاسم، العملة، الهوية)
-                sys_name = str(variables.get("الاسم", "نظام مَجال")).strip('"')
+                check = False
+                if op == 'GT': check = val > threshold
+                elif op == 'LT': check = val < threshold
+                elif op == 'EQ': check = val == threshold
+
+                if check:
+                    results.append(f"🎯 [منطق مَجال]: تحقق الشرط -> {message}")
+                else:
+                    results.append(f"⚪ [منطق مَجال]: لم يتحقق الشرط.")
+
+            # 2️⃣ نظام البناء الشامل
+            elif cmd == 'BUILD':
+                sys_type = stmt[1][1].strip('"')
+                name = str(variables.get("الاسم", "نظام مَجال")).strip('"')
                 currency = str(variables.get("العملة", "SAR")).strip('"')
 
                 if sys_type == "متجر":
-                    results.append(f"""
-🏗️ [نظام مَجال]: تم بناء مشروع (متجر متكامل) لـ {sys_name}:
-- الواجهة: نظام HTML5/Tailwind متجاوب.
-- العملة المعتمدة: {currency}.
-- قاعدة البيانات: SQL جاهزة للمنتجات والطلبات.
-- الحماية: نظام تشفير المعاملات المالية مفعل.
-                    """)
-                elif sys_type == "مستشفى":
-                    results.append(f"""
-🏥 [نظام مَجال]: تم بناء (منظومة طبية شاملة) لـ {sys_name}:
-- إدارة المرضى: ملفات طبية إلكترونية وسجلات الحالات.
-- المواعيد: نظام حجز آلي وربط مع الأطباء.
-- الصيدلية: نظام جرد الأدوية والوصفات.
-- المختبر: لوحة نتائج التحاليل الفورية.
-                    """)
+                    results.append(f"🏗️ [بناء]: تم توليد كود متجر ({name}) بالعملة ({currency}) جاهز للنسخ.")
                 elif sys_type == "بنك":
-                    results.append(f"""
-🏦 [نظام مَجال]: تم بناء (نظام بنكي محصن) لـ {sys_name}:
-- الحسابات: إدارة الحسابات الجارية والادخار بـ ({currency}).
-- الحماية: نظام مصادقة ثنائية (2FA) وتشفير أمني عالي.
-- التحويلات: محرك معالجة الحوالات الفورية.
-- السجلات: سجل كامل للعمليات المالية غير قابل للتلاعب.
-                    """)
-                elif sys_type == "توصيل":
-                    results.append(f"""
-🚚 [نظام مَجال]: تم بناء (منصة لوجستية) لـ {sys_name}:
-- التتبع: نظام خرائط حي لمتابعة الشحنات.
-- السائقين: تطبيق خاص للمناديب واستلام الطلبات.
-- التكاليف: حساب تلقائي لرسوم التوصيل بـ ({currency}).
-                    """)
+                    results.append(f"🏦 [بناء]: تم هندسة النظام البنكي لـ ({name}) بأعلى معايير الأمان.")
                 else:
-                    results.append(f"🏗️ [نظام مَجال]: تم بناء هيكل أساسي لنظام ({sys_type}) مخصص.")
+                    results.append(f"📦 [بناء]: تم إنشاء هيكل ({sys_type}) مخصص.")
 
-            # 2️⃣ المحلل الذكي
-            elif cmd == 'ANALYZE':
-                results.append("🔍 [محلل مَجال]: جاري فحص بنية النظام... ✅ الهيكل سليم ومطابق للمعايير.")
-
-            # 3️⃣ الأوامر الأساسية
+            # 3️⃣ تعريف المتغيرات والطباعة
             elif cmd == 'VAR':
                 variables[stmt[1][1]] = stmt[3][1]
-                results.append(f"✅ تم تعريف [{stmt[1][1]}]")
+                results.append(f"✅ تم حفظ [{stmt[1][1]}]")
 
             elif cmd == 'PRINT':
                 target = stmt[1][1]
                 results.append(str(variables.get(target, target)).strip('"'))
 
         except Exception as e:
-            results.append(f"❌ خطأ في النظام: {str(e)}")
+            results.append(f"❌ خطأ منطقي: {str(e)}")
     
     return "\n".join(results)
