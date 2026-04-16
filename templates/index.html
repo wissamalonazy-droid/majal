@@ -1,152 +1,85 @@
+import re
+
+variables = {}
+
+def tokenize(code):
+    token_specification = [
+        ('IF', r'إذا'), ('BUILD', r'ابني'), ('VAR', r'عرف'),
+        ('ID', r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), ('NUMBER', r'\d+(\.\d+)?'),
+        ('STRING', r'"[^"]*"'), ('ASSIGN', r'='), ('END', r';'), ('SKIP', r'[ \t]+'),
+    ]
+    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
+    return [(mo.lastgroup, mo.group()) for mo in re.finditer(tok_regex, code) if mo.lastgroup != 'SKIP']
+
+def run_interpreter(tokens):
+    global variables
+    results = []
+    statements = []
+    current_stmt = []
+    for t in tokens:
+        current_stmt.append(t)
+        if t[0] == 'END':
+            statements.append(current_stmt); current_stmt = []
+
+    for stmt in statements:
+        try:
+            cmd = stmt[0][0]
+            if cmd == 'BUILD':
+                sys_type = stmt[1][1].strip('"')
+                name = str(variables.get("الاسم", "براند وسام")).strip('"')
+                
+                # ذكاء الأيقونات والخانات
+                raw_tabs = str(variables.get("الخانات", "الرئيسية، السلة، الحساب"))
+                tabs = [t.strip() for t in raw_tabs.split('،')]
+                icon_map = {"الرئيسية": "🏠", "السلة": "🛒", "المتجر": "🛍️", "حسابي": "👤", "الحساب": "👤", "من نحن": "ℹ️"}
+
+                if sys_type == "موقع":
+                    nav_html = "".join([f'<div class="flex flex-col items-center group cursor-pointer opacity-60 hover:opacity-100 transition-all"><span class="text-xl mb-1">{icon_map.get(tab, "✨")}</span><span class="text-[9px] font-bold uppercase">{tab}</span></div>' for tab in tabs])
+                    
+                    results.append(f"""
+💎 [إصدار مَجال 2.1.0 - تصميم الفخامة]:
+--------------------------------------------------
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرك مَجال | بيئة التطوير</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;900&display=swap" rel="stylesheet">
     <style>
-        body { 
-            background-color: #050505; 
-            color: #e2e8f0; 
-            font-family: 'Tajawal', sans-serif;
-            margin: 0;
-        }
-        .glass-card {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        #codeEditor {
-            background: #0a0a0a;
-            color: #3b82f6;
-            font-family: 'Consolas', monospace;
-            resize: none;
-            border: 1px solid #1e293b;
-        }
-        pre {
-            background: #000;
-            padding: 20px;
-            border-radius: 15px;
-            color: #94a3b8;
-            font-size: 13px;
-            overflow-x: auto;
-            border: 1px solid #111;
-        }
+        body {{ background: #050505; color: white; font-family: 'Tajawal', sans-serif; }}
+        .glass {{ background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }}
+        .hero-gradient {{ background: radial-gradient(circle at top, #1e3a8a33 0%, #050505 100%); }}
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="pb-32 hero-gradient min-h-screen">
+    <nav class="p-8 flex justify-between items-center border-b border-white/5">
+        <div class="text-2xl font-black text-blue-500 tracking-tighter uppercase">{name}</div>
+        <div class="w-10 h-10 glass rounded-full flex items-center justify-center text-xs">🔔</div>
+    </nav>
 
-    <div class="max-w-4xl mx-auto">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-black text-white mb-2 tracking-tighter uppercase">محرك مَجال <span class="text-blue-500">2.0.8</span></h1>
-            <p class="text-gray-500 text-sm italic">بيئة تطوير وسام الخاصة - هندسة الواجهات الذكية</p>
-        </header>
-
-        <div class="glass-card p-6 rounded-[2.5rem] shadow-2xl">
-            <textarea id="codeEditor" class="w-full h-64 p-6 rounded-3xl mb-6 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all" placeholder="اكتب أوامر مَجال هنا..."></textarea>
-            
-            <button onclick="runMajal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl transition-all shadow-lg shadow-blue-900/20 uppercase tracking-widest">
-                تشغيل المحرك 🚀
-            </button>
-
-            <div id="output" class="mt-8 min-h-[100px]">
-                <div class="text-gray-600 text-center text-sm">بانتظار الأوامر...</div>
+    <main class="p-8 text-center pt-20">
+        <div class="inline-block px-4 py-1 rounded-full border border-blue-500/30 text-blue-400 text-[10px] mb-6 uppercase tracking-widest font-bold">Generated by Majal Engine</div>
+        <h1 class="text-6xl font-black mb-6 tracking-tighter leading-none">مستقبل <br><span class="text-blue-600 italic uppercase font-black">{name}</span></h1>
+        
+        <div class="grid grid-cols-2 gap-4 mt-16">
+            <div class="glass p-8 rounded-[2.5rem] text-right relative overflow-hidden">
+                <div class="absolute -right-5 -top-5 w-20 h-20 bg-blue-600/10 rounded-full blur-2xl"></div>
+                <h3 class="text-xl font-black mb-2 italic">القسم الرئيسي</h3>
+                <p class="text-gray-500 text-xs font-light tracking-wide">تم بناء الهيكل بناءً على تصور المبرمج وسام.</p>
+            </div>
+            <div class="glass p-8 rounded-[2.5rem] text-right">
+                <h3 class="text-xl font-black mb-2 italic">الإعدادات</h3>
+                <div class="h-1 w-10 bg-blue-600 rounded-full"></div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <div id="copyModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
-        <div class="bg-[#0a0a0a] border border-white/10 w-full max-w-2xl rounded-[3rem] p-8 shadow-2xl">
-            <h3 class="text-xl font-bold mb-6 text-center">تم توليد الكود بنجاح ✨</h3>
-            <div id="modalText" class="hidden"></div>
-            <pre id="displayArea" class="max-h-80 overflow-y-auto mb-8 text-blue-400"></pre>
-            
-            <div class="flex gap-4">
-                <button id="copyBtn" onclick="copyAction()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-blue-900/40 transition-all active:scale-95">
-                    نسخ الكود 📋
-                </button>
-                <button onclick="closeModal()" class="px-8 bg-white/5 text-gray-400 rounded-2xl font-bold">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 1. دالة تشغيل المحرك
-        async function runMajal() {
-            const code = document.getElementById('codeEditor').value;
-            const outputDiv = document.getElementById('output');
-            
-            if(!code.trim()) return alert("اكتب كود أول يا وسام!");
-
-            outputDiv.innerHTML = '<div class="text-blue-500 font-bold text-center animate-pulse">🔄 جاري معالجة "الجنون" البرمجي...</div>';
-            
-            try {
-                const response = await fetch('/run', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({code: code})
-                });
-                const data = await response.json();
-                
-                outputDiv.innerHTML = `
-                    <div onclick="openModal(\`${encodeURIComponent(data.result)}\`)" class="cursor-pointer group">
-                        <pre class="group-hover:border-blue-500/30 transition-all">${data.result}</pre>
-                        <p class="text-[10px] text-blue-500 mt-4 text-center font-black tracking-widest uppercase">اضغط هنا لنسخ الكود المولد 🖱️</p>
-                    </div>`;
-            } catch (e) { 
-                outputDiv.innerHTML = '<div class="text-red-500 text-center font-bold">❌ فشل الاتصال بالمحرك</div>'; 
-            }
-        }
-
-        // 2. دالة فتح النافذة وعرض الكود
-        function openModal(encodedCode) {
-            const decodedCode = decodeURIComponent(encodedCode);
-            document.getElementById('modalText').innerText = decodedCode;
-            document.getElementById('displayArea').innerText = decodedCode;
-            document.getElementById('copyModal').classList.remove('hidden');
-            document.getElementById('copyBtn').innerText = "نسخ الكود 📋";
-            document.getElementById('copyBtn').style.backgroundColor = "#2563eb";
-        }
-
-        function closeModal() {
-            document.getElementById('copyModal').classList.add('hidden');
-        }
-
-        // 3. 🔥 دالة النسخ النهائية (قوية جداً للجوال والكمبيوتر)
-        async function copyAction() {
-            const textToCopy = document.getElementById('modalText').innerText;
-            const btn = document.getElementById('copyBtn');
-
-            try {
-                // الطريقة الأساسية (Clipboard API)
-                await navigator.clipboard.writeText(textToCopy);
-                btn.innerText = "تم النسخ بنجاح! ✅";
-                btn.style.backgroundColor = "#10b981";
-            } catch (err) {
-                // الطريقة الاحتياطية (للمتصفحات المقفولة)
-                const textArea = document.createElement("textarea");
-                textArea.value = textToCopy;
-                textArea.style.position = "fixed"; // تجنب التمرير
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    btn.innerText = "تم النسخ بنجاح! ✅";
-                    btn.style.backgroundColor = "#10b981";
-                } catch (err) {
-                    btn.innerText = "فشل النسخ ❌";
-                }
-                document.body.removeChild(textArea);
-            }
-
-            // إغلاق النافذة تلقائياً بعد ثانية ونصف من النجاح
-            setTimeout(() => {
-                closeModal();
-            }, 1500);
-        }
-    </script>
+    <nav class="fixed bottom-0 w-full bg-black/60 backdrop-blur-2xl p-6 px-10 flex justify-around border-t border-white/5 z-50">
+        {nav_html}
+    </nav>
 </body>
 </html>
+--------------------------------------------------
+""")
+            elif cmd == 'VAR': variables[stmt[1][1]] = stmt[3][1]
+        except: continue
+    return "\n".join(results) if results else "✅ المحرك مستعد للبناء الملكي"
