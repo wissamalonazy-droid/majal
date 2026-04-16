@@ -1,16 +1,17 @@
 import re
-import sqlite3
+
+# ذاكرة اللغة (المكان اللي تنحفظ فيه المتغيرات)
+variables = {}
 
 def tokenize(code):
     token_specification = [
-        ('NUMBER',   r'\d+(\.\d+)?'),       # أرقام
-        ('STRING',   r'"[^"]*"'),           # نصوص
-        ('PRINT',    r'اطبع'),              # أمر الطباعة
-        ('VAR',      r'عرف'),               # تعريف متغير
-        ('ASSIGN',   r'='),                 # مساواة
-        ('PLUS',     r'\+'),                # جمع
-        ('END',      r';'),                 # نهاية السطر
-        ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), # أسماء المتغيرات
+        ('NUMBER',   r'\d+(\.\d+)?'),
+        ('STRING',   r'"[^"]*"'),
+        ('PRINT',    r'اطبع'),
+        ('VAR',      r'عرف'),
+        ('ASSIGN',   r'='),
+        ('END',      r';'),
+        ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'),
         ('SKIP',     r'[ \t]+'),
         ('NEWLINE',  r'\n'),
     ]
@@ -23,25 +24,34 @@ def tokenize(code):
         tokens.append((kind, value))
     return tokens
 
-# مخزن مؤقت للمتغيرات (ذاكرة اللغة)
-variables = {}
-
 def run_interpreter(tokens):
     global variables
     if not tokens: return ""
     
     try:
-        # أمر الطباعة: اطبع "نص" ;
-        if tokens[0][0] == 'PRINT':
-            return tokens[1][1].strip('"')
-            
-        # أمر التعريف: عرف س = 10 ;
+        # --- منطق أمر (عرف) ---
         if tokens[0][0] == 'VAR':
             var_name = tokens[1][1]
             var_value = tokens[3][1]
-            variables[var_name] = var_value
-            return f"✅ تم تعريف {var_name} بقيمة {var_value}"
-            
-        return "💡 تم تحليل الكود بنجاح."
+            variables[var_name] = var_value # تخزين في الذاكرة
+            return f"✅ لغة مجال: تم حفظ المتغير [{var_name}] وقيمته ({var_value})"
+
+        # --- منطق أمر (اطبع) ---
+        if tokens[0][0] == 'PRINT':
+            target_token_type = tokens[1][0]
+            target_value = tokens[1][1]
+
+            # 1. إذا كنت تطبع نص مباشر بين " "
+            if target_token_type == 'STRING':
+                return target_value.strip('"')
+
+            # 2. إذا كنت تطبع اسم متغير (مثل: العمر)
+            elif target_token_type == 'ID':
+                if target_value in variables:
+                    return f"القيمة المخزنة في {target_value} هي: {variables[target_value]}"
+                else:
+                    return f"❌ خطأ: المتغير [{target_value}] غير موجود في ذاكرة مجال."
+
+        return "💡 كود صحيح، بانتظار أمر تنفيذ."
     except Exception as e:
         return f"❌ خطأ في التنفيذ: {str(e)}"
