@@ -1,6 +1,5 @@
 import re
 
-# ذاكرة اللغة (المكان اللي تنحفظ فيه المتغيرات)
 variables = {}
 
 def tokenize(code):
@@ -10,17 +9,18 @@ def tokenize(code):
         ('PRINT',    r'اطبع'),
         ('VAR',      r'عرف'),
         ('ASSIGN',   r'='),
+        ('PLUS',     r'\+'), # علامة الجمع
+        ('MINUS',    r'\-'), # علامة الطرح
         ('END',      r';'),
         ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'),
         ('SKIP',     r'[ \t]+'),
-        ('NEWLINE',  r'\n'),
     ]
     tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
     tokens = []
     for mo in re.finditer(tok_regex, code):
         kind = mo.lastgroup
         value = mo.group()
-        if kind == 'SKIP' or kind == 'NEWLINE': continue
+        if kind == 'SKIP': continue
         tokens.append((kind, value))
     return tokens
 
@@ -29,29 +29,30 @@ def run_interpreter(tokens):
     if not tokens: return ""
     
     try:
-        # --- منطق أمر (عرف) ---
+        # --- تطوير أمر (عرف) ليدعم الحساب البسيط ---
         if tokens[0][0] == 'VAR':
             var_name = tokens[1][1]
-            var_value = tokens[3][1]
-            variables[var_name] = var_value # تخزين في الذاكرة
-            return f"✅ لغة مجال: تم حفظ المتغير [{var_name}] وقيمته ({var_value})"
+            
+            # إذا كان الأمر: عرف س = 10 + 20 ;
+            if len(tokens) >= 6 and tokens[4][0] == 'PLUS':
+                val1 = float(tokens[3][1])
+                val2 = float(tokens[5][1])
+                result = val1 + val2
+                variables[var_name] = result
+                return f"✅ تم الحساب: {var_name} أصبح {result}"
+            
+            # إذا كان تعريف عادي: عرف س = 10 ;
+            else:
+                variables[var_name] = tokens[3][1]
+                return f"✅ تم حفظ {var_name}"
 
-        # --- منطق أمر (اطبع) ---
+        # --- أمر (اطبع) ---
         if tokens[0][0] == 'PRINT':
-            target_token_type = tokens[1][0]
-            target_value = tokens[1][1]
+            target = tokens[1][1]
+            if tokens[1][0] == 'STRING': return target.strip('"')
+            if target in variables: return str(variables[target])
+            return f"❌ {target} غير معرف"
 
-            # 1. إذا كنت تطبع نص مباشر بين " "
-            if target_token_type == 'STRING':
-                return target_value.strip('"')
-
-            # 2. إذا كنت تطبع اسم متغير (مثل: العمر)
-            elif target_token_type == 'ID':
-                if target_value in variables:
-                    return f"القيمة المخزنة في {target_value} هي: {variables[target_value]}"
-                else:
-                    return f"❌ خطأ: المتغير [{target_value}] غير موجود في ذاكرة مجال."
-
-        return "💡 كود صحيح، بانتظار أمر تنفيذ."
+        return "💡 كود سليم"
     except Exception as e:
-        return f"❌ خطأ في التنفيذ: {str(e)}"
+        return f"❌ خطأ: {str(e)}"
