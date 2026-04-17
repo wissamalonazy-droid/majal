@@ -3,68 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAJAL PRO | النواة العالمية</title>
+    <title>MAJAL PRO | المحاكي الذكي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
     <style>
         :root { --primary: #0ea5e9; --bg: #020617; }
         body { 
             background: radial-gradient(circle at top right, #0f172a, var(--bg)); 
             color: #f8fafc; font-family: 'Tajawal', sans-serif;
             margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
-            transition: all 0.3s ease;
         }
+        /* أنماط خاصة باللغة */
         .en-mode { direction: ltr; font-family: sans-serif; }
+        
+        /* تصميم الزجاج */
         .glass { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(20px); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 24px; }
+        
+        /* محرر الكود */
         #codeEditor { font-family: 'Fira Code', monospace; background: transparent; color: #93c5fd; width: 100%; padding: 25px; outline: none; border: none; font-size: 17px; line-height: 1.6; resize: none; }
+        
+        /* أنماط محاكي الأجهزة */
+        .preview-container { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); margin: auto; box-shadow: 0 0 50px rgba(0,0,0,0.5); border: 12px solid #1e293b; border-radius: 32px; background: white; }
+        .mobile-view { width: 375px; height: 667px; }
+        .tablet-view { width: 768px; height: 1024px; }
+        .desktop-view { width: 95%; height: 90%; border: none; border-radius: 0; }
     </style>
 </head>
-<body x-data="{ lang: 'ar', dir: 'rtl' }" :class="lang === 'en' ? 'en-mode' : ''" :dir="dir">
+<body x-data="{ lang: 'ar', dir: 'rtl', view: 'desktop' }" :class="lang === 'en' ? 'en-mode' : ''" :dir="dir">
 
-    <header class="h-[70px] flex items-center justify-between px-8 bg-black/30 border-b border-white/5">
+    <header class="h-[75px] flex items-center justify-between px-8 bg-black/40 border-b border-white/5 backdrop-blur-md">
         <div class="flex items-center gap-4">
-            <h1 class="text-xl font-black text-blue-500 italic uppercase">MAJAL <span class="text-white font-light">PRO</span></h1>
+            <h1 class="text-xl font-black text-blue-500 italic uppercase tracking-tighter">MAJAL <span class="text-white font-light text-sm">PRO</span></h1>
+        </div>
+
+        <div class="hidden md:flex bg-white/5 p-1.5 rounded-2xl border border-white/10 gap-1">
+            <button @click="view = 'mobile'" :class="view === 'mobile' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-2">
+                <span>📱</span> Mobile
+            </button>
+            <button @click="view = 'tablet'" :class="view === 'tablet' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-2">
+                <span>📟</span> Tablet
+            </button>
+            <button @click="view = 'desktop'" :class="view === 'desktop' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'" class="px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-2">
+                <span>💻</span> Desktop
+            </button>
         </div>
 
         <button @click="lang = (lang === 'ar' ? 'en' : 'ar'); dir = (lang === 'ar' ? 'rtl' : 'ltr')" 
-                class="bg-white/5 px-4 py-2 rounded-xl text-[10px] font-bold border border-white/10 hover:bg-blue-500/20 transition-all uppercase tracking-widest">
+                class="bg-white/5 px-5 py-2.5 rounded-2xl text-[10px] font-black border border-white/10 hover:bg-blue-500/20 transition-all uppercase tracking-widest">
             <span x-text="lang === 'ar' ? 'English 🌐' : 'العربية 🌐'"></span>
         </button>
     </header>
 
-    <main class="flex-1 p-6 flex flex-col gap-4 overflow-hidden">
+    <main class="flex-1 p-6 flex flex-col gap-5 overflow-hidden">
         <div class="glass flex-1 flex flex-col overflow-hidden shadow-2xl">
-            <div class="p-3 border-b border-white/5 flex justify-between bg-white/5">
-                <span class="text-[10px] text-blue-400 font-bold uppercase tracking-widest px-2" 
-                      x-text="lang === 'ar' ? 'محرر مَجال الذكي' : 'MAJAL SMART EDITOR'"></span>
-                <div class="flex gap-1.5">
-                    <div class="w-2.5 h-2.5 rounded-full bg-red-500/40"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/40"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-green-500/40"></div>
+            <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></span>
+                    <span class="text-[11px] text-blue-400 font-black uppercase tracking-[0.2em]" x-text="lang === 'ar' ? 'بيئة تطوير مَجال' : 'MAJAL IDE ENVIRONMENT'"></span>
+                </div>
+                <div class="flex gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/40"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/40"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/40"></div>
                 </div>
             </div>
 
             <textarea id="codeEditor" spellcheck="false" 
-                      :placeholder="lang === 'ar' ? '// اكتب كودك هنا...' : '// Write your code here...'"></textarea>
+                      :placeholder="lang === 'ar' ? '// اكتب كود مَجال أو واجهة HTML هنا...' : '// Write Majal code or HTML UI here...'"></textarea>
             
-            <div class="p-4 bg-black/20 text-xs border-t border-white/5 text-gray-400" id="statusBar">
-                <span x-text="lang === 'ar' ? '📟 المحرك جاهز' : '📟 Engine Ready'"></span>
+            <div class="p-4 bg-black/40 text-xs border-t border-white/5 text-blue-300 font-mono min-h-[60px]" id="statusBar">
+                <span x-text="lang === 'ar' ? '📟 النظام جاهز لاستقبال الأوامر' : '📟 System ready for commands'"></span>
             </div>
         </div>
 
-        <button onclick="runMajal()" class="bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black text-xl shadow-xl transition-all flex items-center justify-center gap-3">
+        <button onclick="runMajal()" class="bg-blue-600 hover:bg-blue-500 active:scale-95 p-5 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-900/40 transition-all flex items-center justify-center gap-4 group">
             <span x-text="lang === 'ar' ? 'تشغيل النظام' : 'RUN SYSTEM'"></span>
-            <span>⚡</span>
+            <span class="group-hover:rotate-12 transition-transform">⚡</span>
         </button>
     </main>
 
-    <div id="previewModal" class="fixed inset-0 z-[100] bg-black hidden flex-col">
-        <div class="p-4 bg-zinc-950 flex justify-between items-center border-b border-white/10">
-            <span class="text-blue-500 font-bold text-xs uppercase tracking-widest">Live Architecture View</span>
-            <button onclick="document.getElementById('previewModal').style.display='none'" class="text-white text-3xl">&times;</button>
+    <div id="previewModal" class="fixed inset-0 z-[100] bg-slate-950/95 hidden flex flex-col">
+        <div class="w-full p-4 bg-black flex justify-between items-center border-b border-white/10">
+            <div class="flex items-center gap-6">
+                <span class="text-blue-500 font-black text-xs italic tracking-widest uppercase">Live Architecture</span>
+                <div class="flex bg-white/5 rounded-lg p-1 gap-2">
+                    <button @click="view = 'mobile'" class="p-1 hover:bg-blue-500/20 rounded">📱</button>
+                    <button @click="view = 'tablet'" class="p-1 hover:bg-blue-500/20 rounded">📟</button>
+                    <button @click="view = 'desktop'" class="p-1 hover:bg-blue-500/20 rounded">💻</button>
+                </div>
+            </div>
+            <button onclick="document.getElementById('previewModal').style.display='none'; document.getElementById('previewModal').classList.add('hidden')" 
+                    class="text-white hover:text-red-500 text-4xl transition-colors leading-none">&times;</button>
         </div>
-        <iframe id="livePreview" class="flex-1 w-full bg-white border-none"></iframe>
+        
+        <div class="flex-1 w-full flex items-center justify-center overflow-auto p-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+            <iframe id="livePreview" 
+                    class="preview-container transition-all duration-500" 
+                    :class="view === 'mobile' ? 'mobile-view' : (view === 'tablet' ? 'tablet-view' : 'desktop-view')">
+            </iframe>
+        </div>
     </div>
 
     <script>
@@ -72,6 +111,8 @@
             const code = document.getElementById('codeEditor').value;
             const statusBar = document.getElementById('statusBar');
             if(!code.trim()) return;
+
+            statusBar.innerHTML = '<span class="animate-pulse text-white">🔄 جاري معالجة النواة...</span>';
 
             try {
                 const response = await fetch('/run', {
@@ -81,16 +122,33 @@
                 });
                 const data = await response.json();
                 
-                if (data.result.includes("<!DOCTYPE html>") || data.result.includes("<html")) {
+                // فحص إذا كانت النتيجة HTML لعرض المعاينة
+                if (data.result.toLowerCase().includes("<html") || data.result.toLowerCase().includes("<!doctype")) {
                     const iframe = document.getElementById('livePreview');
                     const doc = iframe.contentWindow.document;
-                    doc.open(); doc.write(data.result); doc.close();
-                    document.getElementById('previewModal').style.display = 'flex';
+                    doc.open(); 
+                    doc.write(data.result); 
+                    doc.close();
+                    
+                    const modal = document.getElementById('previewModal');
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+                    statusBar.innerHTML = '✅ تم تشغيل الواجهة بنجاح';
                 } else {
-                    statusBar.innerHTML = `<span class="text-blue-300 font-mono">${data.result}</span>`;
+                    // عرض مخرجات البرمجة النصية
+                    statusBar.innerHTML = `<div class="whitespace-pre-line text-blue-200">${data.result}</div>`;
                 }
-            } catch (e) { statusBar.innerText = "❌ Connection Error"; }
+            } catch (e) { 
+                statusBar.innerText = "❌ خطأ في الاتصال بالنواة"; 
+            }
         }
+
+        // دعم اختصار لوحة المفاتيح
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                runMajal();
+            }
+        });
     </script>
 </body>
 </html>
