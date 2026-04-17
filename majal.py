@@ -4,9 +4,11 @@ variables = {}
 
 def tokenize(code):
     if not code: return []
+    # تعريف الأوامر باللغتين (العربية والإنجليزية)
     token_specification = [
-        ('VAR',      r'عرف'),          
-        ('BUILD',    r'ابني'),         
+        ('VAR',      r'عرف|VAR'),          
+        ('BUILD',    r'ابني|BUILD'),        
+        ('PRINT',    r'اطبع|PRINT'),        
         ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), 
         ('NUMBER',   r'\d+(\.\d+)?'),  
         ('STRING',   r'"[^"]*"'),      
@@ -15,27 +17,24 @@ def tokenize(code):
         ('SKIP',     r'[ \t]+'),       
         ('NEWLINE',  r'\n'),           
     ]
+    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
     tokens = []
-    line = 1
-    for mo in re.finditer('|'.join('(?P<%s>%s)' % pair for pair in token_specification), code):
+    line_num = 1
+    for mo in re.finditer(tok_regex, code):
         kind = mo.lastgroup
         value = mo.group()
-        if kind == 'NEWLINE': line += 1
+        if kind == 'NEWLINE': line_num += 1
         elif kind == 'SKIP': continue
-        else: tokens.append((kind, value, line))
+        else: tokens.append((kind, value, line_num))
     return tokens
 
 def run_interpreter(tokens, raw_code):
     global variables
-    variables = {} # تصقير الذاكرة لكل عملية بناء جديدة
+    variables = {}
+    results = []
     errors = []
     
-    # 🕵️ فحص الفواصل المنقوطة قبل كل شيء
-    raw_lines = raw_code.strip().split('\n')
-    for i, l in enumerate(raw_lines):
-        if l.strip() and not l.strip().endswith(';'):
-            errors.append(f"⚠️ السطر {i+1}: نسيت تحط ';' في نهاية الأمر.")
-
+    # تقسيم الجمل البرمجية
     statements = []
     current_stmt = []
     for t in tokens:
@@ -44,33 +43,41 @@ def run_interpreter(tokens, raw_code):
             statements.append(current_stmt)
             current_stmt = []
 
-    # إذا فيه أخطاء هيكلية نوقف فوراً
-    if errors:
-        return "❌ [أخطاء برمجية في كود مَجال]:\n" + "\n".join(errors)
+    # 🕵️ فحص هيكلي عالمي (الأخطاء تظهر بلغة المبرمج)
+    raw_lines = raw_code.strip().split('\n')
+    for i, line in enumerate(raw_lines):
+        if line.strip() and not line.strip().endswith(';'):
+            errors.append(f"⚠️ Line {i+1}: Missing ';' at the end of statement.")
 
-    output_html = ""
+    if errors: return "❌ [Compiler Error]:\n" + "\n".join(errors)
+
+    # تنفيذ المنطق البرمجي (عربي + إنجليزي)
     for stmt in statements:
         try:
             cmd = stmt[0][0]
-            if cmd == 'VAR':
-                # فحص تركيب جملة التعريف: عرف + اسم + = + قيمة + ;
-                if len(stmt) < 5 or stmt[2][0] != 'ASSIGN':
-                    errors.append(f"❌ السطر {stmt[0][2]}: تركيب أمر 'عرف' غلط. (تأكد من وجود '=')")
-                else:
-                    variables[stmt[1][1]] = stmt[3][1].strip('"')
             
-            elif cmd == 'BUILD':
-                # تنفيذ البناء فقط إذا كانت البيانات مكتملة
-                name = variables.get("الاسم", "متجر غير مسمى")
-                color = variables.get("اللون", "#3b82f6")
-                # هنا يتم استدعاء قالب البناء المطور (HTML)
-                output_html = f"" 
-            else:
-                errors.append(f"❓ السطر {stmt[0][2]}: الأمر '{stmt[0][1]}' غير مفهوم في لغة مَجال.")
-        except:
-            errors.append(f"❌ السطر {stmt[0][2]}: فيه مشكلة في كتابة السطر.")
+            if cmd == 'VAR':
+                var_name = stmt[1][1]
+                var_value = stmt[3][1].strip('"')
+                variables[var_name] = var_value
+            
+            elif cmd == 'PRINT':
+                val = variables.get(stmt[1][1], stmt[1][1].strip('"'))
+                results.append(f"Console: {val}")
 
-    if errors:
-        return "⚠️ [تقرير الأخطاء]:\n" + "\n".join(errors)
-    
-    return "✅ الكود سليم 100%! المبرمج وسام حر في بناء إمبراطوريته."
+            elif cmd == 'BUILD':
+                # بناء الموقع يدعم اللغتين بناءً على محتوى المتغيرات
+                name = variables.get("Name", variables.get("الاسم", "Global Store"))
+                color = variables.get("Color", variables.get("اللون", "#3b82f6"))
+                lang = "en" if "Name" in variables else "ar"
+                dir_attr = "ltr" if lang == "en" else "rtl"
+                
+                # هنا يولد المحرك كود HTML ذكي يتكيف مع اللغة المختارة
+                results.append(f"🏗️ Building {lang.upper()} Website: {name}...")
+                # (سيتم حقن قالب الـ HTML العالمي هنا)
+
+        except Exception:
+            errors.append(f"❌ Syntax Error on line {stmt[0][2]}")
+
+    if errors: return "⚠️ [Error Report]:\n" + "\n".join(errors)
+    return "\n".join(results)
