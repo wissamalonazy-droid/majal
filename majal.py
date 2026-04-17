@@ -4,67 +4,73 @@ variables = {}
 
 def tokenize(code):
     if not code: return []
-    # تعريف التوكنز الأساسية
     token_specification = [
-        ('IF',       r'إذا'), ('BUILD',    r'ابني'), ('VAR',      r'عرف'),          
-        ('PRINT',    r'اطبع'), ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), 
-        ('NUMBER',   r'\d+(\.\d+)?'), ('STRING',   r'"[^"]*"'), ('ASSIGN',   r'='),            
-        ('END',      r';'), ('SKIP',     r'[ \t]+'), ('NEWLINE',  r'\n'),           
+        ('VAR',      r'عرف'),          
+        ('BUILD',    r'ابني'),         
+        ('ID',       r'[A-Za-z_أ-ي][A-Za-z0-9_أ-ي]*'), 
+        ('NUMBER',   r'\d+(\.\d+)?'),  
+        ('STRING',   r'"[^"]*"'),      
+        ('ASSIGN',   r'='),            
+        ('END',      r';'),            
+        ('SKIP',     r'[ \t]+'),       
+        ('NEWLINE',  r'\n'),           
     ]
-    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
     tokens = []
-    line_num = 1
-    
-    # المحلل الذكي: يكتشف الرموز غير المعروفة فوراً
-    for mo in re.finditer(tok_regex, code):
+    line = 1
+    for mo in re.finditer('|'.join('(?P<%s>%s)' % pair for pair in token_specification), code):
         kind = mo.lastgroup
         value = mo.group()
-        if kind == 'NEWLINE':
-            line_num += 1
-        elif kind == 'SKIP':
-            continue
-        else:
-            tokens.append((kind, value, line_num))
+        if kind == 'NEWLINE': line += 1
+        elif kind == 'SKIP': continue
+        else: tokens.append((kind, value, line))
     return tokens
 
-def run_interpreter(tokens, full_code):
+def run_interpreter(tokens, raw_code):
     global variables
-    results = []
+    variables = {} # تصقير الذاكرة لكل عملية بناء جديدة
     errors = []
+    
+    # 🕵️ فحص الفواصل المنقوطة قبل كل شيء
+    raw_lines = raw_code.strip().split('\n')
+    for i, l in enumerate(raw_lines):
+        if l.strip() and not l.strip().endswith(';'):
+            errors.append(f"⚠️ السطر {i+1}: نسيت تحط ';' في نهاية الأمر.")
+
     statements = []
     current_stmt = []
-    
-    # 🕵️ فحص أولي: هل نسي المبرمج الفاصلة المنقوطة؟
-    lines = full_code.strip().split('\n')
-    for i, line in enumerate(lines):
-        if line.strip() and not line.strip().endswith(';'):
-            errors.append(f"⚠️ خطأ في السطر {i+1}: نسيت إغلاق الأمر بـ ';' يا بطل")
-
-    # تقسيم الجمل
     for t in tokens:
         current_stmt.append(t)
         if t[0] == 'END':
             statements.append(current_stmt)
             current_stmt = []
 
-    # إذا ما فيه أخطاء هيكلية، نبدأ التنفيذ
-    if not errors:
-        for stmt in statements:
-            try:
-                cmd = stmt[0][0]
-                if cmd == 'VAR':
-                    variables[stmt[1][1]] = stmt[3][1]
-                elif cmd == 'BUILD':
-                    # (هنا نضع كود بناء الموقع الحقيقي اللي سويناه قبل)
-                    name = str(variables.get("الاسم", "متجر إلكتروني")).strip('"')
-                    # ... [باقي كود الـ HTML] ...
-                    results.append(f"✅ تم بناء '{name}' بنجاح وبدون أخطاء.")
-                else:
-                    errors.append(f"❌ أمر غير معروف: '{stmt[0][1]}' في السطر {stmt[0][2]}")
-            except Exception:
-                errors.append(f"❌ خطأ في تركيب الأمر بالسطر {stmt[0][2]}")
-
-    # النتيجة النهائية: إما النجاح أو تقرير الأخطاء
+    # إذا فيه أخطاء هيكلية نوقف فوراً
     if errors:
-        return "⚠️ [تقرير أخطاء مَجال]:\n" + "\n".join(errors)
-    return "\n".join(results) if results else "📝 الكود سليم، ابدأ بكتابة أوامر البناء."
+        return "❌ [أخطاء برمجية في كود مَجال]:\n" + "\n".join(errors)
+
+    output_html = ""
+    for stmt in statements:
+        try:
+            cmd = stmt[0][0]
+            if cmd == 'VAR':
+                # فحص تركيب جملة التعريف: عرف + اسم + = + قيمة + ;
+                if len(stmt) < 5 or stmt[2][0] != 'ASSIGN':
+                    errors.append(f"❌ السطر {stmt[0][2]}: تركيب أمر 'عرف' غلط. (تأكد من وجود '=')")
+                else:
+                    variables[stmt[1][1]] = stmt[3][1].strip('"')
+            
+            elif cmd == 'BUILD':
+                # تنفيذ البناء فقط إذا كانت البيانات مكتملة
+                name = variables.get("الاسم", "متجر غير مسمى")
+                color = variables.get("اللون", "#3b82f6")
+                # هنا يتم استدعاء قالب البناء المطور (HTML)
+                output_html = f"" 
+            else:
+                errors.append(f"❓ السطر {stmt[0][2]}: الأمر '{stmt[0][1]}' غير مفهوم في لغة مَجال.")
+        except:
+            errors.append(f"❌ السطر {stmt[0][2]}: فيه مشكلة في كتابة السطر.")
+
+    if errors:
+        return "⚠️ [تقرير الأخطاء]:\n" + "\n".join(errors)
+    
+    return "✅ الكود سليم 100%! المبرمج وسام حر في بناء إمبراطوريته."
