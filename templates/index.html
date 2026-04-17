@@ -3,31 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAJAL PRO | Wide Interface</title>
+    <title>MAJAL PRO 2.2.0 | Ultimate Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;900&display=swap" rel="stylesheet">
     <style>
         body { 
-            background: #050505; 
+            background: radial-gradient(circle at top right, #0a192f, #020617); /* الخلفية الفخمة */
             color: #f8fafc; 
             font-family: 'Tajawal', sans-serif;
             margin: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         .header {
-            height: 70px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
-            background: #0a0a0a;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0 40px;
+            background: rgba(10, 10, 10, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
         }
+        .neon-text { text-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+        
         .editor-container {
             flex: 1;
+            padding: 20px;
             position: relative;
+        }
+        /* كارد المحرر النيوني */
+        .pro-card { 
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(59, 130, 246, 0.2); 
+            border-radius: 30px;
+            height: 100%;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
         }
         #codeEditor {
             background: transparent;
@@ -38,10 +53,23 @@
             padding: 40px;
             outline: none;
             border: none;
-            font-size: 20px; /* خط كبير وواضح */
+            font-size: 22px; /* خط كبير وواضح */
             line-height: 1.6;
         }
-        /* نافذة المعاينة العائمة */
+        
+        /* زر البناء المتدرج (القديم) */
+        .btn-grad {
+            background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+            padding: 15px 40px;
+            border-radius: 18px;
+            font-weight: 900;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.5);
+        }
+        .btn-grad:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.6); }
+        .btn-grad:active { transform: scale(0.96); }
+
+        /* نافذة المعاينة الكاملة */
         #previewModal {
             position: fixed;
             inset: 0;
@@ -51,56 +79,53 @@
             flex-direction: column;
         }
         .preview-header {
-            background: #111;
-            padding: 15px 25px;
+            background: #050505;
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-b: 1px solid rgba(255, 255, 255, 0.05);
         }
         iframe { width: 100%; flex: 1; border: none; }
-        .magic-btn {
-            background: #2563eb;
-            padding: 12px 35px;
-            border-radius: 15px;
-            font-weight: 900;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
-        }
-        .magic-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <h1 class="text-2xl font-black text-blue-500 tracking-tighter uppercase italic">MAJAL <span class="text-white">PRO</span></h1>
-        <div class="flex gap-4">
-            <button onclick="runMajal()" class="magic-btn">بناء ومعاينة ⚡</button>
+        <div class="flex items-center gap-2">
+            <h1 class="text-3xl font-black text-blue-500 tracking-tighter uppercase neon-text italic">MAJAL <span class="text-white">PRO</span></h1>
+            <span class="text-[10px] text-gray-600 mt-2">2.2.0</span>
         </div>
+        <button onclick="runMajal()" class="btn-grad text-white text-lg tracking-widest uppercase flex items-center gap-3">
+            بناء ومعاينة ⚡
+        </button>
     </header>
 
     <div class="editor-container">
-        <textarea id="codeEditor" placeholder="أدخل أوامرك هنا..."></textarea>
+        <div class="pro-card">
+            <textarea id="codeEditor" placeholder="// أدخل أوامرك البرمجية هنا يا وسام..."></textarea>
+        </div>
     </div>
 
     <div id="previewModal">
         <div class="preview-header">
-            <span class="text-blue-400 font-black text-sm uppercase tracking-widest italic">Live Preview</span>
-            <div class="flex gap-4">
-                <button onclick="showCode()" class="bg-white/10 px-4 py-2 rounded-lg text-xs font-bold">عرض الكود 📄</button>
-                <button onclick="closePreview()" class="text-white text-3xl font-light">&times;</button>
+            <span class="text-blue-400 font-black text-sm uppercase tracking-widest italic neon-text">Live Architecture Preview</span>
+            <div class="flex gap-4 items-center">
+                <button onclick="showCode()" class="bg-white/5 px-5 py-2 rounded-xl text-xs font-bold text-gray-300 hover:bg-white/10 transition-all">عرض الكود المولد 📄</button>
+                <button onclick="closePreview()" class="text-white text-4xl font-light hover:text-red-500 transition-colors">&times;</button>
             </div>
         </div>
         <iframe id="livePreview"></iframe>
     </div>
 
-    <div id="copyModal" class="fixed inset-0 bg-black/98 hidden z-[200] flex flex-col p-10 backdrop-blur-xl">
-        <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
-            <h2 class="text-xl font-bold text-blue-500 uppercase italic">Source Code</h2>
-            <button onclick="closeCode()" class="text-white text-3xl">&times;</button>
+    <div id="copyModal" class="fixed inset-0 bg-black/98 hidden z-[200] flex flex-col p-10 backdrop-blur-2xl">
+        <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-5">
+            <h2 class="text-2xl font-black text-blue-500 uppercase italic neon-text">Generated Source Code</h2>
+            <button onclick="closeCode()" class="text-white text-4xl">&times;</button>
         </div>
-        <pre id="modalText" class="flex-1 bg-gray-900/50 p-8 rounded-3xl overflow-auto text-blue-400 font-mono text-sm border border-white/5"></pre>
-        <div class="mt-8 flex justify-center">
-            <button id="copyBtn" onclick="copyAction()" class="bg-blue-600 px-16 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-blue-900/40">نسخ الكود الكامل 📋</button>
+        <pre id="modalText" class="flex-1 bg-gray-900/40 p-10 rounded-[2.5rem] overflow-auto text-blue-300 font-mono text-base border border-white/5 shadow-inner"></pre>
+        <div class="mt-10 flex justify-center">
+            <button id="copyBtn" onclick="copyAction()" class="btn-grad px-20 py-5 text-white font-black text-xl shadow-2xl active:scale-95">نسخ الكود الكامل 📋</button>
         </div>
     </div>
 
@@ -127,7 +152,6 @@
                     doc.write(htmlCode);
                     doc.close();
                     
-                    // إظهار المعاينة بملء الشاشة
                     document.getElementById('previewModal').style.display = 'flex';
                 }
             } catch (e) { alert("خطأ في الاتصال بالسيرفر"); }
@@ -147,6 +171,7 @@
             document.getElementById('copyModal').classList.remove('hidden');
         }
 
+        function closeModal() { document.getElementById('copyModal').classList.add('hidden'); }
         function closeCode() { document.getElementById('copyModal').classList.add('hidden'); }
 
         async function copyAction() {
@@ -154,10 +179,10 @@
             await navigator.clipboard.writeText(text);
             const btn = document.getElementById('copyBtn');
             btn.innerText = "تم النسخ بنجاح! ✅";
-            btn.style.backgroundColor = "#10b981";
+            btn.style.background = "linear-gradient(135deg, #10b981 0%, #059669 100%)";
             setTimeout(() => { 
                 btn.innerText = "نسخ الكود الكامل 📋"; 
-                btn.style.backgroundColor = "#2563eb";
+                btn.style.background = "linear-gradient(135deg, #2563eb 0%, #0891b2 100%)";
             }, 2000);
         }
     </script>
