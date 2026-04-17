@@ -3,96 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAJAL PRO | Live Interface</title>
+    <title>MAJAL PRO | Wide Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;900&display=swap" rel="stylesheet">
     <style>
         body { 
-            background: #020617; 
+            background: #050505; 
             color: #f8fafc; 
             font-family: 'Tajawal', sans-serif;
             margin: 0;
             height: 100vh;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            height: calc(100vh - 80px);
+        .header {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            background: #0a0a0a;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .editor-section {
-            border-left: 1px solid rgba(255, 255, 255, 0.05);
-            background: #050505;
-        }
-        .preview-section {
-            background: #ffffff; /* خلفية المعاينة بيضاء لتبدو كمتصفح حقيقي */
-            color: black;
+        .editor-container {
+            flex: 1;
+            position: relative;
         }
         #codeEditor {
             background: transparent;
             color: #60a5fa;
             font-family: 'Consolas', monospace;
-            resize: none;
             width: 100%;
             height: 100%;
-            padding: 30px;
+            padding: 40px;
             outline: none;
             border: none;
-            font-size: 18px;
+            font-size: 20px; /* خط كبير وواضح */
+            line-height: 1.6;
         }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        /* نافذة المعاينة العائمة */
+        #previewModal {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
         }
-        .header {
-            height: 80px;
+        .preview-header {
+            background: #111;
+            padding: 15px 25px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 0 40px;
-            background: #050505;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: center;
         }
+        iframe { width: 100%; flex: 1; border: none; }
         .magic-btn {
             background: #2563eb;
-            padding: 10px 30px;
-            border-radius: 12px;
+            padding: 12px 35px;
+            border-radius: 15px;
             font-weight: 900;
             transition: 0.3s;
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
         }
-        .magic-btn:hover { background: #1d4ed8; transform: scale(1.05); }
+        .magic-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <h1 class="text-2xl font-black text-blue-500 tracking-tighter uppercase">MAJAL <span class="text-white">PRO</span></h1>
-        <button onclick="runMajal()" class="magic-btn">توليد ومعاينة ⚡</button>
+        <h1 class="text-2xl font-black text-blue-500 tracking-tighter uppercase italic">MAJAL <span class="text-white">PRO</span></h1>
+        <div class="flex gap-4">
+            <button onclick="runMajal()" class="magic-btn">بناء ومعاينة ⚡</button>
+        </div>
     </header>
 
-    <div class="main-grid">
-        <div class="editor-section">
-            <textarea id="codeEditor" placeholder="أدخل أوامر البرمجة هنا..."></textarea>
-        </div>
-
-        <div class="preview-section" id="previewContainer">
-            <div id="placeholderText" class="h-full flex items-center justify-center text-gray-400 font-bold italic">
-                بانتظار بناء الواجهة...
-            </div>
-            <iframe id="livePreview" class="hidden"></iframe>
-        </div>
+    <div class="editor-container">
+        <textarea id="codeEditor" placeholder="أدخل أوامرك هنا..."></textarea>
     </div>
 
-    <div id="copyModal" class="fixed inset-0 bg-black/95 hidden z-[100] flex flex-col p-10 backdrop-blur-xl">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-blue-400 uppercase">Generated Source Code</h2>
-            <button onclick="closeModal()" class="text-white text-3xl">&times;</button>
+    <div id="previewModal">
+        <div class="preview-header">
+            <span class="text-blue-400 font-black text-sm uppercase tracking-widest italic">Live Preview</span>
+            <div class="flex gap-4">
+                <button onclick="showCode()" class="bg-white/10 px-4 py-2 rounded-lg text-xs font-bold">عرض الكود 📄</button>
+                <button onclick="closePreview()" class="text-white text-3xl font-light">&times;</button>
+            </div>
         </div>
-        <pre id="modalText" class="flex-1 bg-gray-900 p-6 rounded-2xl overflow-auto text-emerald-400 font-mono text-sm"></pre>
-        <div class="mt-6 flex justify-center gap-4">
-            <button id="copyBtn" onclick="copyAction()" class="bg-blue-600 px-12 py-4 rounded-xl font-black">نسخ الكود 📋</button>
-            <button onclick="toggleView()" class="bg-white/10 px-8 py-4 rounded-xl font-bold">رجوع للمعاينة</button>
+        <iframe id="livePreview"></iframe>
+    </div>
+
+    <div id="copyModal" class="fixed inset-0 bg-black/98 hidden z-[200] flex flex-col p-10 backdrop-blur-xl">
+        <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+            <h2 class="text-xl font-bold text-blue-500 uppercase italic">Source Code</h2>
+            <button onclick="closeCode()" class="text-white text-3xl">&times;</button>
+        </div>
+        <pre id="modalText" class="flex-1 bg-gray-900/50 p-8 rounded-3xl overflow-auto text-blue-400 font-mono text-sm border border-white/5"></pre>
+        <div class="mt-8 flex justify-center">
+            <button id="copyBtn" onclick="copyAction()" class="bg-blue-600 px-16 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-blue-900/40">نسخ الكود الكامل 📋</button>
         </div>
     </div>
 
@@ -109,56 +117,48 @@
                 });
                 const data = await response.json();
                 
-                // استخراج كود الـ HTML من مخرجات السيرفر
-                const rawResult = data.result;
-                const htmlCode = extractHTML(rawResult);
+                const htmlCode = extractHTML(data.result);
 
                 if (htmlCode) {
+                    window.lastGeneratedCode = htmlCode;
                     const iframe = document.getElementById('livePreview');
-                    const placeholder = document.getElementById('placeholderText');
-                    
-                    placeholder.classList.add('hidden');
-                    iframe.classList.remove('hidden');
-                    
-                    // حقن الكود المولد داخل الـ Iframe للعرض المباشر
                     const doc = iframe.contentWindow.document;
                     doc.open();
                     doc.write(htmlCode);
                     doc.close();
-
-                    // تخزين الكود للنسخ لاحقاً
-                    window.lastGeneratedCode = htmlCode;
                     
-                    // إظهار زر صغير أو خيار للنسخ إذا أراد المستخدم
-                    console.log("تم تحديث المعاينة الحية");
+                    // إظهار المعاينة بملء الشاشة
+                    document.getElementById('previewModal').style.display = 'flex';
                 }
-            } catch (e) { alert("خطأ في الاتصال"); }
+            } catch (e) { alert("خطأ في الاتصال بالسيرفر"); }
         }
 
-        // دالة لاستخراج كود HTML فقط من رد السيرفر
         function extractHTML(text) {
             const start = text.indexOf('<!DOCTYPE html>');
             const end = text.lastIndexOf('</html>') + 7;
-            if (start !== -1 && end !== -1) {
-                return text.substring(start, end);
-            }
+            if (start !== -1 && end !== -1) return text.substring(start, end);
             return null;
         }
 
-        // وظائف النسخ والـ Modal
+        function closePreview() { document.getElementById('previewModal').style.display = 'none'; }
+        
         function showCode() {
-            if(!window.lastGeneratedCode) return alert("ابني الموقع أولاً!");
             document.getElementById('modalText').innerText = window.lastGeneratedCode;
             document.getElementById('copyModal').classList.remove('hidden');
         }
 
-        function closeModal() { document.getElementById('copyModal').classList.add('hidden'); }
+        function closeCode() { document.getElementById('copyModal').classList.add('hidden'); }
 
         async function copyAction() {
             const text = document.getElementById('modalText').innerText;
             await navigator.clipboard.writeText(text);
-            document.getElementById('copyBtn').innerText = "تم النسخ! ✅";
-            setTimeout(() => { document.getElementById('copyBtn').innerText = "نسخ الكود 📋"; }, 2000);
+            const btn = document.getElementById('copyBtn');
+            btn.innerText = "تم النسخ بنجاح! ✅";
+            btn.style.backgroundColor = "#10b981";
+            setTimeout(() => { 
+                btn.innerText = "نسخ الكود الكامل 📋"; 
+                btn.style.backgroundColor = "#2563eb";
+            }, 2000);
         }
     </script>
 </body>
