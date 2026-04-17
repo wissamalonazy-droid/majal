@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAJAL PRO ENGINE | النواة المفتوحة</title>
+    <title>MAJAL PRO | النواة العالمية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -13,101 +13,65 @@
             background: radial-gradient(circle at top right, #0f172a, var(--bg)); 
             color: #f8fafc; font-family: 'Tajawal', sans-serif;
             margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+            transition: all 0.3s ease;
         }
-        .glass { 
-            background: rgba(15, 23, 42, 0.5); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(59, 130, 246, 0.2); 
-            border-radius: 24px; 
-        }
-        #codeEditor { 
-            font-family: 'Fira Code', 'Consolas', monospace; 
-            background: transparent; 
-            color: #93c5fd; 
-            width: 100%; 
-            padding: 25px; 
-            outline: none; 
-            border: none; 
-            font-size: 17px; 
-            line-height: 1.6; 
-            resize: none; 
-        }
-        .status-bar { 
-            background: rgba(0, 0, 0, 0.4); 
-            padding: 15px 25px; 
-            font-size: 13px; 
-            border-top: 1px solid rgba(255, 255, 255, 0.05); 
-            min-height: 60px;
-        }
-        .btn-run {
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-            padding: 16px; border-radius: 18px; font-weight: 900;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3);
-        }
-        .btn-run:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(14, 165, 233, 0.5); }
-        
-        /* Modal Style */
-        #previewModal {
-            position: fixed; inset: 0; z-index: 100; display: none;
-            flex-direction: column; background: #000;
-        }
-        iframe { width: 100%; flex: 1; border: none; background: #fff; }
+        .en-mode { direction: ltr; font-family: sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(20px); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 24px; }
+        #codeEditor { font-family: 'Fira Code', monospace; background: transparent; color: #93c5fd; width: 100%; padding: 25px; outline: none; border: none; font-size: 17px; line-height: 1.6; resize: none; }
     </style>
 </head>
-<body x-data="{ lang: 'ar' }">
+<body x-data="{ lang: 'ar', dir: 'rtl' }" :class="lang === 'en' ? 'en-mode' : ''" :dir="dir">
 
     <header class="h-[70px] flex items-center justify-between px-8 bg-black/30 border-b border-white/5">
         <div class="flex items-center gap-4">
-            <div class="flex gap-1.5">
-                <div class="w-3 h-3 rounded-full bg-red-500/40"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-500/40"></div>
-                <div class="w-3 h-3 rounded-full bg-green-500/40"></div>
-            </div>
-            <h1 class="text-xl font-black text-blue-500 italic">MAJAL <span class="text-white font-light">PRO</span></h1>
+            <h1 class="text-xl font-black text-blue-500 italic uppercase">MAJAL <span class="text-white font-light">PRO</span></h1>
         </div>
-        <div class="text-[10px] text-gray-500 font-mono tracking-widest uppercase">Open Nucleus v10.0.4</div>
+
+        <button @click="lang = (lang === 'ar' ? 'en' : 'ar'); dir = (lang === 'ar' ? 'rtl' : 'ltr')" 
+                class="bg-white/5 px-4 py-2 rounded-xl text-[10px] font-bold border border-white/10 hover:bg-blue-500/20 transition-all uppercase tracking-widest">
+            <span x-text="lang === 'ar' ? 'English 🌐' : 'العربية 🌐'"></span>
+        </button>
     </header>
 
     <main class="flex-1 p-6 flex flex-col gap-4 overflow-hidden">
         <div class="glass flex-1 flex flex-col overflow-hidden shadow-2xl">
             <div class="p-3 border-b border-white/5 flex justify-between bg-white/5">
-                <span class="text-[10px] text-blue-400 font-bold uppercase tracking-widest px-2">System Script Editor</span>
+                <span class="text-[10px] text-blue-400 font-bold uppercase tracking-widest px-2" 
+                      x-text="lang === 'ar' ? 'محرر مَجال الذكي' : 'MAJAL SMART EDITOR'"></span>
+                <div class="flex gap-1.5">
+                    <div class="w-2.5 h-2.5 rounded-full bg-red-500/40"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/40"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-green-500/40"></div>
+                </div>
             </div>
-            <textarea id="codeEditor" spellcheck="false" placeholder="// اكتب كود HTML للمعاينة أو أوامر مَجال المنطقية..."></textarea>
+
+            <textarea id="codeEditor" spellcheck="false" 
+                      :placeholder="lang === 'ar' ? '// اكتب كودك هنا...' : '// Write your code here...'"></textarea>
             
-            <div class="status-bar flex items-center" id="statusBar">
-                <span class="text-gray-500">📟 محرك مَجال في وضع الاستعداد...</span>
+            <div class="p-4 bg-black/20 text-xs border-t border-white/5 text-gray-400" id="statusBar">
+                <span x-text="lang === 'ar' ? '📟 المحرك جاهز' : '📟 Engine Ready'"></span>
             </div>
         </div>
 
-        <button onclick="runMajal()" class="btn-run text-white flex items-center justify-center gap-3">
-            <span id="btnText">تشغيل النظام</span>
-            <span class="text-xl font-bold italic">⚡</span>
+        <button onclick="runMajal()" class="bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black text-xl shadow-xl transition-all flex items-center justify-center gap-3">
+            <span x-text="lang === 'ar' ? 'تشغيل النظام' : 'RUN SYSTEM'"></span>
+            <span>⚡</span>
         </button>
     </main>
 
-    <div id="previewModal">
+    <div id="previewModal" class="fixed inset-0 z-[100] bg-black hidden flex-col">
         <div class="p-4 bg-zinc-950 flex justify-between items-center border-b border-white/10">
-            <div class="flex items-center gap-3">
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                <span class="text-blue-500 font-bold text-xs uppercase tracking-widest">Live Architecture View</span>
-            </div>
-            <button onclick="closePreview()" class="text-gray-500 hover:text-white text-3xl transition-colors">&times;</button>
+            <span class="text-blue-500 font-bold text-xs uppercase tracking-widest">Live Architecture View</span>
+            <button onclick="document.getElementById('previewModal').style.display='none'" class="text-white text-3xl">&times;</button>
         </div>
-        <iframe id="livePreview"></iframe>
+        <iframe id="livePreview" class="flex-1 w-full bg-white border-none"></iframe>
     </div>
 
     <script>
         async function runMajal() {
             const code = document.getElementById('codeEditor').value;
             const statusBar = document.getElementById('statusBar');
-            const btnText = document.getElementById('btnText');
-            
             if(!code.trim()) return;
-
-            btnText.innerText = "جاري المعالجة...";
-            statusBar.innerHTML = '<span class="text-blue-400 animate-pulse">🔄 جاري تحليل النواة...</span>';
 
             try {
                 const response = await fetch('/run', {
@@ -117,37 +81,16 @@
                 });
                 const data = await response.json();
                 
-                // التحقق: هل النتيجة كود HTML أم مخرجات منطقية؟
                 if (data.result.includes("<!DOCTYPE html>") || data.result.includes("<html")) {
-                    statusBar.innerHTML = '<span class="text-green-500 font-bold">✅ تم بناء الواجهة بنجاح!</span>';
-                    
                     const iframe = document.getElementById('livePreview');
                     const doc = iframe.contentWindow.document;
-                    doc.open();
-                    doc.write(data.result);
-                    doc.close();
-                    
-                    setTimeout(() => {
-                        document.getElementById('previewModal').style.display = 'flex';
-                    }, 400);
+                    doc.open(); doc.write(data.result); doc.close();
+                    document.getElementById('previewModal').style.display = 'flex';
                 } else {
-                    // عرض مخرجات البرمجة المنطقية (مثل اطبع/PRINT)
-                    statusBar.innerHTML = `<div class="text-blue-300 font-mono leading-relaxed">${data.result.replace(/\n/g, '<br>')}</div>`;
+                    statusBar.innerHTML = `<span class="text-blue-300 font-mono">${data.result}</span>`;
                 }
-            } catch (e) {
-                statusBar.innerHTML = '<span class="text-red-500">❌ فشل الاتصال بالنواة.</span>';
-            }
-            btnText.innerText = "تشغيل النظام";
+            } catch (e) { statusBar.innerText = "❌ Connection Error"; }
         }
-
-        function closePreview() {
-            document.getElementById('previewModal').style.display = 'none';
-        }
-
-        // دعم اختصار CTRL + Enter
-        document.getElementById('codeEditor').addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') runMajal();
-        });
     </script>
 </body>
 </html>
