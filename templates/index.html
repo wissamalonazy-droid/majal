@@ -1,137 +1,189 @@
-<!-- MAJAL v2 FULL (مختصر لأهم الأجزاء المطورة) -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Majal v2 FIXED</title>
+
+<style>
+:root {
+  --ink:#0d0f14;
+  --text:#d4daf0;
+  --card:#181c26;
+  --amber:#f5a623;
+  --line:#1f2535;
+}
+
+* {margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  background:var(--ink);
+  color:var(--text);
+  font-family:monospace;
+}
+
+textarea{
+  width:100%;
+  height:40vh;
+  background:#111;
+  color:#fff;
+  padding:10px;
+}
+
+button{
+  padding:10px;
+  background:var(--amber);
+  border:none;
+  cursor:pointer;
+}
+
+#out{
+  background:#000;
+  padding:10px;
+  min-height:200px;
+}
+</style>
+</head>
+
+<body>
+
+<textarea id="code">
+// مثال جاهز
+
+منتج عطر {
+  اسم: "فاخر"
+  سعر: 500
+  مخزون: 2
+}
+
+سلة طلب {}
+
+أضف(طلب, عطر, 1)
+
+حاول {
+  اشتري(طلب)
+} امسك {
+  أطبع("فشل")
+}
+
+قيّم(عطر, 5, "جبار")
+</textarea>
+
+<button onclick="run()">تشغيل</button>
+
+<div id="out"></div>
 
 <script>
 
-// =============================
-// 🆕 ORDER SYSTEM
-// =============================
-let ORDER_ID = 1000;
+// ================== TOKENS ==================
+const KEYWORDS = [
+'منتج','سلة','عميل','خصم','إذا','وإلا',
+'أضف','اشتري','أطبع',
+'حاول','امسك','قيّم'
+];
 
-class Interpreter {
-  constructor() {
-    this.out = [];
-    this.orders = [];
-    this.global = new Env();
-    this._setupBuiltins();
+// ================== LEXER بسيط ==================
+function tokenize(code){
+  return code.split(/\s+/).filter(Boolean);
+}
+
+// ================== Interpreter بسيط ==================
+let env = {};
+let output = [];
+
+function print(msg){
+  output.push(msg);
+}
+
+function run(){
+  output=[];
+  env={};
+  const code=document.getElementById("code").value;
+
+  try{
+    exec(code);
+  }catch(e){
+    print("❌ "+e.message);
   }
 
-  execBuiltinCall(node, env) {
-    const args = node.args.map(a => this.eval(a, env));
+  document.getElementById("out").innerHTML=
+    output.map(x=>"<div>"+x+"</div>").join("");
+}
 
-    switch(node.kind) {
+// ================== EXEC ==================
+function exec(code){
 
-      // =============================
-      // 🆕 ADD TO CART (unchanged)
-      // =============================
-      case 'Add': {
-        const [cart, prod, qty=1] = args;
-        cart._items.push({ prod, qty });
-        this.emit(`🛒 ${prod.اسم} × ${qty}`, 'ok');
-        return;
-      }
+  // منتج
+  code.replace(/منتج\s+(\w+)\s*{([^}]*)}/g,(m,name,body)=>{
+    let obj={type:"product",reviews:[]};
 
-      // =============================
-      // 🔥 NEW CHECKOUT SYSTEM
-      // =============================
-      case 'Checkout': {
-        const [cart] = args;
+    body.split("\n").forEach(line=>{
+      let [k,v]=line.split(":");
+      if(!k)return;
+      obj[k.trim()] = isNaN(v) ? v.replace(/"/g,'').trim() : Number(v);
+    });
 
-        let total = 0;
+    env[name]=obj;
+    print("📦 "+name);
+  });
 
-        for (const item of cart._items) {
-          if (item.prod.مخزون < item.qty) {
-            throw new Error(`المخزون غير كافٍ: ${item.prod.اسم}`);
-          }
+  // سلة
+  code.replace(/سلة\s+(\w+)/g,(m,name)=>{
+    env[name]={type:"cart",items:[]};
+    print("🛒 "+name);
+  });
 
-          const sub = item.prod.سعر * item.qty;
-          total += sub;
+  // أضف
+  code.replace(/أضف\(([^)]+)\)/g,(m,args)=>{
+    let [c,p,q]=args.split(",").map(x=>x.trim());
+    env[c].items.push({p:env[p],q:Number(q)});
+    print("➕ "+p);
+  });
 
-          // 🆕 خصم المخزون
-          item.prod.مخزون -= item.qty;
-        }
-
-        const order = {
-          id: ++ORDER_ID,
-          total,
-          items: cart._items,
-          status: "تم"
-        };
-
-        this.orders.push(order);
-
-        this.emit(`🧾 طلب رقم #${order.id}`, 'sec');
-        this.emit(`💰 الإجمالي: ${total}`, 'price');
-
-        return order;
-      }
-
-      // =============================
-      // ⭐ REVIEWS SYSTEM
-      // =============================
-      case 'Rate': {
-        const [prod, stars, comment] = args;
-
-        if (!prod.تقييمات) prod.تقييمات = [];
-
-        prod.تقييمات.push({ stars, comment });
-
-        this.emit(`⭐ تقييم ${stars}/5 على ${prod.اسم}`, 'ok');
-        return;
-      }
-
-      // =============================
-      // 📊 REPORT (improved)
-      // =============================
-      case 'Report': {
-        const [obj] = args;
-
-        this.emit(`📊 تقرير`, 'sec');
-
-        if (obj._type === 'cart') {
-          let total = 0;
-
-          for (const item of obj._items) {
-            const sub = item.qty * item.prod.سعر;
-            total += sub;
-
-            this.emit(`${item.prod.اسم} × ${item.qty} = ${sub}`, 'val');
-          }
-
-          this.emit(`الإجمالي: ${total}`, 'price');
-        }
-
-        return;
-      }
+  // حاول / امسك
+  if(code.includes("حاول")){
+    try{
+      exec(code.split("حاول")[1].split("امسك")[0]);
+    }catch(e){
+      exec(code.split("امسك")[1]);
     }
   }
+
+  // اشتري
+  code.replace(/اشتري\(([^)]+)\)/g,(m,arg)=>{
+    let cart=env[arg.trim()];
+    let total=0;
+
+    cart.items.forEach(i=>{
+      if(i.p.مخزون < i.q){
+        throw new Error("نفذ المخزون");
+      }
+
+      i.p.مخزون -= i.q;
+      total += i.p.سعر * i.q;
+    });
+
+    print("💳 تم الشراء: "+total);
+  });
+
+  // قيّم
+  code.replace(/قيّم\(([^)]+)\)/g,(m,args)=>{
+    let [p,s,c]=args.split(",");
+    env[p.trim()].reviews.push({
+      stars:Number(s),
+      comment:c.replace(/"/g,'')
+    });
+
+    print("⭐ تم التقييم");
+  });
+
+  // أطبع
+  code.replace(/أطبع\(([^)]+)\)/g,(m,arg)=>{
+    print(arg.replace(/"/g,''));
+  });
 
 }
 
-// =============================
-// 🆕 TRY / CATCH SUPPORT
-// =============================
-Parser.prototype.parseTry = function() {
-  this.advance(); // حاول
-  const tryBlock = this.parseBlock();
-
-  this.expect('امسك');
-  const catchBlock = this.parseBlock();
-
-  return { type:'Try', tryBlock, catchBlock };
-};
-
-Interpreter.prototype.exec = function(node, env) {
-
-  if (node.type === 'Try') {
-    try {
-      this.execBlock(node.tryBlock.body, env);
-    } catch (e) {
-      this.execBlock(node.catchBlock.body, env);
-    }
-    return;
-  }
-
-  return this._execOriginal(node, env);
-};
-
 </script>
+
+</body>
+</html>
