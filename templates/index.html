@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مَجال PRO | النسخة المتكاملة v19</title>
+<title>مَجال PRO | الاستجابة القصوى v21</title>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root { --sys-bg: #030508; --sys-panel: #0a0d14; --sys-border: #1a1f2b; --sys-accent: #f5a623; }
@@ -13,161 +13,142 @@ body { background: var(--sys-bg); color: #d1d5db; font-family: 'Tajawal', sans-s
 /* Header */
 .top-nav { height: 60px; background: var(--sys-panel); border-bottom: 1px solid var(--sys-border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; flex-shrink: 0; }
 .logo { font-size: 20px; font-weight: 900; color: var(--sys-accent); }
-.controls { display: flex; gap: 10px; }
-.btn { border: none; padding: 8px 20px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.2s; font-family: 'Tajawal'; }
-.btn-run { background: var(--sys-accent); color: #000; }
-.btn-export { background: #30363d; color: #fff; }
+.btn-build { background: var(--sys-accent); color: #000; border: none; padding: 10px 35px; border-radius: 12px; font-weight: 900; cursor: pointer; transition: 0.3s; }
 
-/* Layout */
-.main-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-.top-view { height: 50%; background: #000; display: flex; justify-content: center; padding: 15px; border-bottom: 2px solid var(--sys-border); overflow: hidden; }
-#preview-frame { width: 100%; max-width: 950px; background: #fff; border-radius: 20px; border: none; transition: 0.5s; }
+/* Layout 50-25-25 */
+.layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.view-pane { height: 50%; background: #000; display: flex; justify-content: center; padding: 15px; border-bottom: 2px solid var(--sys-border); background-image: radial-gradient(#1f2937 1px, transparent 1px); background-size: 20px 20px; }
+#preview-frame { width: 100%; max-width: 950px; background: #fff; border-radius: 25px; border: none; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
 
-.bottom-control { height: 50%; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--sys-border); }
-.pane { background: var(--sys-bg); display: flex; flex-direction: column; overflow: hidden; }
-.pane-label { padding: 8px 15px; font-size: 10px; background: var(--sys-panel); color: #6b7280; border-bottom: 1px solid var(--sys-border); font-weight: 900; display: flex; justify-content: space-between; align-items: center; }
+.control-pane { height: 50%; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--sys-border); }
+.sub-pane { background: var(--sys-bg); display: flex; flex-direction: column; overflow: hidden; }
+.pane-hdr { padding: 8px 15px; font-size: 10px; background: var(--sys-panel); color: #6b7280; border-bottom: 1px solid var(--sys-border); font-weight: 900; display: flex; justify-content: space-between; }
 
-#input-command { flex: 1; background: transparent; color: var(--sys-accent); border: none; outline: none; padding: 20px; font-size: 16px; font-weight: 700; resize: none; line-height: 1.6; }
-#code-output { flex: 1; background: #010204; color: #7ee787; border: none; outline: none; padding: 20px; font-family: 'Fira Code', monospace; font-size: 12px; direction: ltr; text-align: left; }
+#user-input { flex: 1; background: transparent; color: var(--sys-accent); border: none; outline: none; padding: 25px; font-size: 18px; font-weight: 700; resize: none; line-height: 1.6; text-align: right; }
+#code-out { flex: 1; background: #010204; color: #7ee787; border: none; outline: none; padding: 25px; font-family: 'Fira Code', monospace; font-size: 12px; direction: ltr; text-align: left; }
 </style>
 </head>
 <body>
 
 <header class="top-nav">
-  <div class="logo">مَجال PRO <span>| النظام المتكامل v19</span></div>
-  <div class="controls">
-    <button class="btn btn-export" onclick="downloadProject()">📥 تحميل الملف</button>
-    <button class="btn btn-run" onclick="buildFullStore()">⚡ بناء وتفعيل</button>
-  </div>
+  <div class="logo">مَجال PRO <span>| مفسر الاستجابة v21</span></div>
+  <button class="btn-build" onclick="forceSovereignBuild()">⚡ تنفيذ البناء الآن</button>
 </header>
 
-<div class="main-layout">
-  <div class="top-view">
-    <iframe id="preview-frame"></iframe>
-  </div>
-
-  <div class="bottom-control">
-    <div class="pane">
-      <div class="pane-label">المواصفات الهندسية (اسم، ألوان، نوع المنتج)</div>
-      <textarea id="input-command">متجر سديم لبيع العطور ألوان أسود وذهبي، الحواف دائرية</textarea>
+<div class="layout">
+  <div class="view-pane"><iframe id="preview-frame"></iframe></div>
+  <div class="control-pane">
+    <div class="sub-pane">
+      <div class="pane-hdr">أمر المواصفات (اكتب ألوانك بوضوح)</div>
+      <textarea id="user-input" placeholder="مثال: متجر سديم لبيع العطور ألوان أسود وذهبي"></textarea>
     </div>
-    <div class="pane">
-      <div class="pane-label">كود البرمجة النهائي</div>
-      <textarea id="code-output" readonly></textarea>
+    <div class="sub-pane">
+      <div class="pane-hdr">الكود المولد <button onclick="copyCode()" style="color:var(--sys-accent); cursor:pointer; background:none; border:none;">[نسخ]</button></div>
+      <textarea id="code-out" readonly></textarea>
     </div>
   </div>
 </div>
 
 <script>
-function buildFullStore() {
-  const prompt = document.getElementById('input-command').value.trim();
+function forceSovereignBuild() {
+  const prompt = document.getElementById('user-input').value.trim();
   if (!prompt) return;
 
-  // 1. محرك تحليل "الملي متر" (The Specs Parser)
-  const name = prompt.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجر جديد";
-  
-  // دقة الألوان
-  const colorMap = {'أسود':'#000','أبيض':'#fff','ذهبي':'#d4af37','أزرق':'#2563eb','أحمر':'#e11d48','بني':'#78350f','أخضر':'#16a34a'};
-  let bg = '#ffffff', primary = '#2563eb', text = '#000';
-  Object.keys(colorMap).forEach(c => {
-    if (prompt.includes(c)) {
-      if (c === 'أسود') { bg = '#000'; text = '#fff'; }
-      else if (c === 'أبيض') { bg = '#fff'; text = '#000'; }
-      else { primary = colorMap[c]; }
+  // 1. مفسر الألوان الذكي (فحص شامل للجملة)
+  const palette = {
+    'أسود': '#000000', 'أبيض': '#ffffff', 'ذهبي': '#d4af37', 
+    'أزرق': '#2563eb', 'أحمر': '#e11d48', 'أخضر': '#16a34a', 'فضي': '#c0c0c0'
+  };
+
+  let bg = '#ffffff'; 
+  let primary = '#2563eb'; 
+  let text = '#000000';
+
+  // فحص الخلفية أولاً
+  if (prompt.includes('أسود')) { bg = '#000000'; text = '#ffffff'; }
+  else if (prompt.includes('أبيض')) { bg = '#ffffff'; text = '#000000'; }
+
+  // فحص لون الهوية (الأزرار والماركة)
+  Object.keys(palette).forEach(c => {
+    if (prompt.includes(c) && c !== 'أسود' && c !== 'أبيض') {
+      primary = palette[c];
     }
   });
 
-  const radius = prompt.includes("دائرية") ? "30px" : "8px";
-  
-  // 2. تحديد الصور بناءً على النوع
-  let imgUrl = "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400"; // عطر افتراضي
-  if (prompt.includes("ساعة")) imgUrl = "https://images.unsplash.com/photo-1524592093044-306bd1ad5524?w=400";
-  if (prompt.includes("كتاب")) imgUrl = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400";
+  // 2. استخراج الاسم والأيقونة
+  const storeName = prompt.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجر السيادة";
+  let icon = "📦";
+  if(prompt.includes("عطر")) icon = "🧴";
+  if(prompt.includes("ساعة")) icon = "⌚";
 
-  // 3. الكود المولد (Full Stack Front-end)
-  const finalHTML = `<!DOCTYPE html>
+  // 3. بناء الكود الصافي بـ CSS Variables للتحكم المطلق
+  const finalCode = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root { --primary: ${primary}; --bg: ${bg}; --text: ${text}; }
-    body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 100px; }
-    header { background: var(--primary); padding: 40px 20px; text-align: center; color: #fff; position: relative; }
-    .cart-btn { position: absolute; left: 20px; top: 40%; background: rgba(0,0,0,0.2); padding: 10px 20px; border-radius: 50px; cursor: pointer; border: 1px solid rgba(255,255,255,0.3); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
-    .card { background: ${bg === '#000' ? '#111' : '#fff'}; border-radius: ${radius}; border: 1px solid var(--primary)33; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
-    .card img { width: 100%; height: 250px; object-fit: cover; }
-    .card-info { padding: 20px; }
-    .price { color: var(--primary); font-weight: 900; font-size: 24px; margin: 10px 0; }
-    .tax-hint { font-size: 10px; opacity: 0.6; }
-    button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: ${radius}; width: 100%; font-weight: 900; cursor: pointer; transition: 0.3s; }
-    button:hover { filter: brightness(1.2); }
-    #cart-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99; justify-content:center; align-items:center; }
-    .modal-box { background: white; color: black; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; }
+    :root { --p: ${primary}; --bg: ${bg}; --t: ${text}; }
+    body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--t); margin: 0; padding: 0; }
+    header { background: var(--p); padding: 60px 20px; text-align: center; color: ${primary === '#ffffff' ? '#000' : '#fff'}; }
+    .store-title { font-size: 50px; font-weight: 900; margin: 0; }
+    .nav { position: fixed; top: 0; width: 100%; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.1); backdrop-filter: blur(10px); }
+    .cart-box { background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 15px; font-weight: 900; cursor: pointer; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; padding: 50px 30px; max-width: 1200px; margin: 0 auto; }
+    .card { background: ${bg === '#000000' ? '#111' : '#f9f9f9'}; padding: 30px; border-radius: 30px; border: 2px solid var(--p)22; text-align: center; transition: 0.3s; }
+    .card:hover { transform: translateY(-10px); border-color: var(--p); }
+    .price { color: var(--p); font-weight: 900; font-size: 30px; margin: 15px 0; }
+    .btn { background: var(--p); color: white; border: none; padding: 18px; border-radius: 18px; width: 100%; font-weight: 900; cursor: pointer; font-size: 18px; }
+    
+    /* سلة جانبية احترافية */
+    #cart-sidebar { position: fixed; top: 0; left: -400px; width: 350px; height: 100%; background: #fff; color: #000; transition: 0.4s; z-index: 999; box-shadow: 5px 0 30px rgba(0,0,0,0.5); padding: 40px 30px; display: flex; flex-direction: column; }
+    #cart-sidebar.open { left: 0; }
+    .close-btn { cursor: pointer; font-size: 30px; text-align: left; }
   </style>
 </head>
 <body>
-  <header>
-    <div class="cart-btn" onclick="toggleCart()">🛒 السلة (<span id="cart-count">0</span>)</div>
-    <h1 style="margin:0; font-size: 35px;">${name}</h1>
-  </header>
-
-  <div class="grid">
-    ${[1, 2, 3, 4].map(i => `
-    <div class="card">
-      <img src="${imgUrl}" alt="Product">
-      <div class="card-info">
-        <h3>منتج فاخر ${i}</h3>
-        <div class="price">400 ريال</div>
-        <div class="tax-hint">+60 ريال ضريبة (15%)</div>
-        <button onclick="addToCart(460)">إضافة للسلّة</button>
-      </div>
-    </div>`).join('')}
-  </div>
-
-  <div id="cart-modal" onclick="toggleCart()">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3>ملخص الفاتورة</h3>
-      <hr>
-      <p id="bill-details">السلة فارغة</p>
-      <h2 id="total-price">الإجمالي: 0 ريال</h2>
-      <button onclick="alert('تم تحويلك لبوابة الدفع...')">إتمام الشراء</button>
+  <div id="cart-sidebar">
+    <div class="close-btn" onclick="toggleCart()">×</div>
+    <h2>🛒 سلة المشتريات</h2>
+    <div id="cart-items" style="flex:1; margin: 20px 0;">السلة فارغة</div>
+    <div style="border-top: 2px solid #eee; padding-top: 20px;">
+      <h3>الإجمالي: <span id="total">0</span> ريال</h3>
+      <button class="btn" style="background: #16a34a" onclick="alert('جاري الدفع...')">إتمام الطلب</button>
     </div>
   </div>
 
+  <div class="nav"><div class="cart-box" onclick="toggleCart()">السلة (<span id="count">0</span>)</div> <div style="font-weight:900;">${storeName}</div></div>
+  <header><h1 class="store-title">${storeName}</h1></header>
+  
+  <div class="grid">
+    <div class="card"><div style="font-size:70px">${icon}</div><h3>منتج حصري</h3><div class="price">350 ريال</div><button class="btn" onclick="add('منتج حصري', 350)">إضافة للسلّة</button></div>
+    <div class="card"><div style="font-size:70px">${icon}</div><h3>منتج ملكي</h3><div class="price">500 ريال</div><button class="btn" onclick="add('منتج ملكي', 500)">إضافة للسلّة</button></div>
+  </div>
+
   <script>
-    let total = 0; let count = 0;
-    function addToCart(price) {
-      total += price; count++;
-      document.getElementById('cart-count').innerText = count;
-      alert('أضيف للسلة بالملي!');
-    }
-    function toggleCart() {
-      const m = document.getElementById('cart-modal');
-      m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-      document.getElementById('bill-details').innerText = 'عدد المنتجات: ' + count;
-      document.getElementById('total-price').innerText = 'الإجمالي: ' + total + ' ريال';
+    let cart = []; let total = 0;
+    function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); }
+    function add(name, price) {
+      cart.push({name, price}); total += price;
+      document.getElementById('count').innerText = cart.length;
+      document.getElementById('total').innerText = total;
+      document.getElementById('cart-items').innerHTML = cart.map(i => \`<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>\${i.name}</span><b>\${i.price} ريال</b></div>\`).join('');
     }
   <\/script>
 </body>
 </html>`;
 
-  document.getElementById('code-output').value = finalHTML;
+  document.getElementById('code-out').value = finalCode;
   const frame = document.getElementById('preview-frame');
   frame.contentWindow.document.open();
-  frame.contentWindow.document.write(finalHTML);
+  frame.contentWindow.document.write(finalCode);
   frame.contentWindow.document.close();
 }
 
-function downloadProject() {
-  const code = document.getElementById('code-output').value;
-  if(!code) return alert("بني المتجر أولاً!");
-  const blob = new Blob([code], { type: 'text/html' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'majal_store.html';
-  a.click();
+function copyCode() {
+  const codeOut = document.getElementById('code-out');
+  codeOut.select();
+  document.execCommand('copy');
+  alert("تم نسخ الكود السيادي!");
 }
 </script>
 </body>
