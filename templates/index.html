@@ -1,109 +1,1390 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>MAJAL PRO | PRECISION ENGINE</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap" rel="stylesheet">
-    <style>
-        html, body { height: 100%; margin: 0; overflow: hidden; background-color: #050505; color: white; font-family: 'Tajawal', sans-serif; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        #majal-editor { font-family: 'monospace'; background: transparent; border: none; outline: none; resize: none; color: #93c5fd; font-size: 20px; width: 100%; height: 100%; padding: 35px; font-weight: bold; }
-        #live-canvas { background: #fff; border-radius: 35px; width: 100%; height: 100%; overflow: auto; border: 4px solid #1e293b; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopScript — لغة المتاجر الإلكترونية</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #0f1318;
+    --panel: #141920;
+    --border: #1e2730;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff6b;
+    --gold: #ffd700;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --error: #ff4757;
+    --success: #39ff6b;
+    --keyword: #ff6b35;
+    --string: #ffd700;
+    --number: #00d4ff;
+    --comment: #4a5568;
+    --func: #c792ea;
+    --type: #39ff6b;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Cairo’, sans-serif;
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* Grid Background */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+background-size: 40px 40px;
+pointer-events: none;
+z-index: 0;
+}
+
+/* Header */
+header {
+position: relative;
+z-index: 10;
+padding: 24px 40px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+border-bottom: 1px solid var(–border);
+background: rgba(10,12,16,0.95);
+backdrop-filter: blur(20px);
+}
+
+.logo {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.logo-icon {
+width: 40px;
+height: 40px;
+background: linear-gradient(135deg, var(–accent), var(–accent2));
+border-radius: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 20px;
+font-weight: 900;
+color: var(–bg);
+font-family: ‘JetBrains Mono’, monospace;
+}
+
+.logo-text {
+font-size: 22px;
+font-weight: 700;
+letter-spacing: -0.5px;
+}
+
+.logo-text span { color: var(–accent); }
+
+.logo-sub {
+font-size: 11px;
+color: var(–muted);
+font-weight: 300;
+letter-spacing: 2px;
+text-transform: uppercase;
+}
+
+.version-badge {
+background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(255,107,53,0.1));
+border: 1px solid var(–accent);
+padding: 4px 14px;
+border-radius: 20px;
+font-size: 12px;
+color: var(–accent);
+font-family: ‘JetBrains Mono’, monospace;
+}
+
+/* Hero */
+.hero {
+position: relative;
+z-index: 5;
+text-align: center;
+padding: 60px 40px 40px;
+}
+
+.hero-tag {
+display: inline-block;
+background: rgba(57,255,107,0.1);
+border: 1px solid var(–accent3);
+color: var(–accent3);
+padding: 5px 16px;
+border-radius: 20px;
+font-size: 12px;
+letter-spacing: 3px;
+text-transform: uppercase;
+margin-bottom: 20px;
+}
+
+.hero h1 {
+font-size: clamp(36px, 6vw, 64px);
+font-weight: 900;
+line-height: 1.1;
+margin-bottom: 16px;
+}
+
+.hero h1 .accent { color: var(–accent); }
+.hero h1 .accent2 { color: var(–accent2); }
+
+.hero p {
+font-size: 18px;
+color: var(–muted);
+max-width: 600px;
+margin: 0 auto 40px;
+font-weight: 300;
+line-height: 1.7;
+}
+
+/* Main Layout */
+.main-layout {
+position: relative;
+z-index: 5;
+display: grid;
+grid-template-columns: 280px 1fr 340px;
+gap: 0;
+height: calc(100vh - 200px);
+min-height: 600px;
+border-top: 1px solid var(–border);
+}
+
+/* Sidebar */
+.sidebar {
+background: var(–surface);
+border-left: 1px solid var(–border);
+overflow-y: auto;
+padding: 20px 0;
+}
+
+.sidebar-title {
+font-size: 11px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+padding: 0 20px 12px;
+border-bottom: 1px solid var(–border);
+margin-bottom: 8px;
+}
+
+.example-item {
+padding: 10px 20px;
+cursor: pointer;
+transition: all 0.2s;
+border-right: 3px solid transparent;
+}
+
+.example-item:hover, .example-item.active {
+background: rgba(0,212,255,0.05);
+border-right-color: var(–accent);
+}
+
+.example-item .ex-name {
+font-size: 14px;
+font-weight: 600;
+color: var(–text);
+}
+
+.example-item .ex-desc {
+font-size: 12px;
+color: var(–muted);
+margin-top: 2px;
+}
+
+/* Editor */
+.editor-panel {
+display: flex;
+flex-direction: column;
+border-left: 1px solid var(–border);
+}
+
+.editor-header {
+background: var(–panel);
+padding: 12px 20px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+border-bottom: 1px solid var(–border);
+flex-shrink: 0;
+}
+
+.editor-tabs {
+display: flex;
+gap: 4px;
+}
+
+.editor-tab {
+padding: 6px 16px;
+border-radius: 6px;
+font-size: 13px;
+font-family: ‘JetBrains Mono’, monospace;
+cursor: pointer;
+color: var(–muted);
+transition: all 0.2s;
+}
+
+.editor-tab.active {
+background: rgba(0,212,255,0.1);
+color: var(–accent);
+}
+
+.run-btn {
+background: linear-gradient(135deg, var(–accent), #0099bb);
+color: var(–bg);
+border: none;
+padding: 8px 24px;
+border-radius: 8px;
+font-family: ‘Cairo’, sans-serif;
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.2s;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.run-btn:hover {
+transform: translateY(-1px);
+box-shadow: 0 4px 20px rgba(0,212,255,0.4);
+}
+
+.run-btn:active { transform: translateY(0); }
+
+.editor-wrapper {
+flex: 1;
+position: relative;
+overflow: hidden;
+}
+
+.line-numbers {
+position: absolute;
+top: 0;
+right: 0;
+width: 50px;
+padding: 16px 8px;
+background: var(–surface);
+border-left: 1px solid var(–border);
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+line-height: 1.8;
+color: var(–muted);
+text-align: center;
+pointer-events: none;
+z-index: 2;
+overflow: hidden;
+}
+
+#codeEditor {
+width: 100%;
+height: 100%;
+background: var(–bg);
+color: transparent;
+caret-color: var(–accent);
+border: none;
+outline: none;
+padding: 16px 60px 16px 16px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+line-height: 1.8;
+resize: none;
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+z-index: 3;
+tab-size: 2;
+white-space: pre;
+overflow-wrap: normal;
+overflow-x: auto;
+}
+
+#highlightLayer {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+padding: 16px 60px 16px 16px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+line-height: 1.8;
+pointer-events: none;
+z-index: 1;
+white-space: pre;
+overflow-wrap: normal;
+overflow-x: auto;
+color: var(–text);
+}
+
+/* Output Panel */
+.output-panel {
+background: var(–surface);
+display: flex;
+flex-direction: column;
+}
+
+.output-header {
+padding: 12px 20px;
+border-bottom: 1px solid var(–border);
+font-size: 12px;
+letter-spacing: 2px;
+color: var(–muted);
+text-transform: uppercase;
+display: flex;
+align-items: center;
+justify-content: space-between;
+flex-shrink: 0;
+}
+
+.output-status {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: var(–muted);
+transition: all 0.3s;
+}
+
+.output-status.running { background: var(–gold); animation: pulse 1s infinite; }
+.output-status.success { background: var(–success); }
+.output-status.error { background: var(–error); }
+
+@keyframes pulse {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.3; }
+}
+
+#outputArea {
+flex: 1;
+padding: 16px;
+overflow-y: auto;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+line-height: 1.8;
+}
+
+.output-line { margin-bottom: 4px; }
+.output-line.info { color: var(–text); }
+.output-line.success { color: var(–success); }
+.output-line.error { color: var(–error); }
+.output-line.warn { color: var(–gold); }
+.output-line.section {
+color: var(–accent);
+margin-top: 8px;
+font-weight: 700;
+}
+.output-line.data { color: var(–accent3); }
+.output-line.price { color: var(–gold); }
+.output-line.dim { color: var(–muted); font-size: 11px; }
+
+/* Docs section */
+.docs-section {
+position: relative;
+z-index: 5;
+padding: 60px 40px;
+border-top: 1px solid var(–border);
+}
+
+.docs-title {
+font-size: 28px;
+font-weight: 700;
+margin-bottom: 8px;
+}
+
+.docs-title span { color: var(–accent); }
+
+.docs-subtitle {
+color: var(–muted);
+margin-bottom: 40px;
+font-size: 15px;
+}
+
+.docs-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+gap: 16px;
+}
+
+.doc-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 20px;
+transition: all 0.3s;
+}
+
+.doc-card:hover {
+border-color: var(–accent);
+transform: translateY(-2px);
+box-shadow: 0 8px 32px rgba(0,212,255,0.1);
+}
+
+.doc-card-header {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 12px;
+}
+
+.doc-card-icon {
+width: 36px;
+height: 36px;
+border-radius: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 16px;
+}
+
+.doc-card-title {
+font-size: 15px;
+font-weight: 700;
+}
+
+.doc-card-body {
+font-size: 13px;
+color: var(–muted);
+line-height: 1.6;
+}
+
+.code-snippet {
+background: var(–bg);
+border: 1px solid var(–border);
+border-radius: 6px;
+padding: 10px 12px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+margin-top: 10px;
+line-height: 1.7;
+}
+
+.kw { color: var(–keyword); font-weight: 700; }
+.str { color: var(–string); }
+.num { color: var(–number); }
+.fn { color: var(–func); }
+.cm { color: var(–comment); }
+.tp { color: var(–type); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(–border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(–muted); }
+
+@media (max-width: 900px) {
+.main-layout { grid-template-columns: 1fr; grid-template-rows: auto 400px 300px; height: auto; }
+.sidebar { display: none; }
+header { padding: 16px 20px; }
+.hero { padding: 40px 20px 20px; }
+.docs-section { padding: 40px 20px; }
+}
+</style>
+
 </head>
-<body x-data="majalApp()" x-init="init()">
+<body>
 
-    <header class="h-[65px] flex items-center justify-between px-10 border-b border-white/5 bg-black/50 z-50">
-        <h1 class="text-xl font-black italic text-blue-500">MAJAL <span class="text-white font-light text-xs">PRECISION v8.0</span></h1>
-        <div id="build-timer" class="text-[10px] font-mono text-gray-500 tracking-widest uppercase">READY TO BUILD</div>
-    </header>
+<!-- Header -->
 
-    <main class="flex flex-col h-[calc(100vh-65px)] p-5 gap-5">
-        <div class="flex-1 glass rounded-[35px] flex flex-col overflow-hidden border border-blue-500/10">
-            <textarea id="majal-editor" @input="onInput($event)" placeholder="مثال: متجر سديم لبيع العطور ألوان أسود وذهبي"></textarea>
-        </div>
-        <div class="flex-1 glass rounded-[35px] flex flex-col overflow-hidden">
-            <div id="live-canvas">
-                <div class="flex items-center justify-center h-full text-gray-600 italic text-sm">أدخل أمر البناء بدقة ليتم التنفيذ...</div>
-            </div>
-        </div>
-    </main>
+<header>
+  <div class="logo">
+    <div class="logo-icon">S</div>
+    <div>
+      <div class="logo-text"><span>Shop</span>Script</div>
+      <div class="logo-sub">E-Commerce Language</div>
+    </div>
+  </div>
+  <div class="version-badge">v1.0.0 — BETA</div>
+</header>
 
-    <script>
-        function majalApp() {
-            return {
-                init() { this.generate(); },
-                onInput() { this.generate(); },
-                generate() {
-                    const startTime = performance.now();
-                    const input = document.getElementById('majal-editor').value.trim();
-                    const canvas = document.getElementById('live-canvas');
-                    const timerDisp = document.getElementById('build-timer');
-                    
-                    if (!input.includes("متجر")) return;
+<!-- Hero -->
 
-                    // 1. استخراج اسم المتجر بدقة
-                    let storeName = "متجر جديد";
-                    const nameMatch = input.match(/متجر\s+([\u0621-\u064A0-9]+(\s+[\u0621-\u064A0-9]+)?)/);
-                    if (nameMatch && nameMatch[1]) {
-                        storeName = nameMatch[1].replace(/لبيع|ألوان|بالون|لون/g, "").trim();
-                    }
+<div class="hero">
+  <div class="hero-tag">🛒 لغة برمجة مخصصة للمتاجر</div>
+  <h1>أول لغة برمجة<br><span class="accent">عربية</span> لـ<span class="accent2"> التجارة الإلكترونية</span></h1>
+  <p>ShopScript — لغة مبنية من الصفر، مصممة خصيصاً للتعامل مع المنتجات، الطلبات، العملاء، والمخزون بكود نظيف وبسيط.</p>
+</div>
 
-                    // 2. تحليل الألوان
-                    const colorMap = {
-                        'أحمر': '#ef4444', 'أزرق': '#2563eb', 'أصفر': '#eab308', 'أبيض': '#ffffff', 
-                        'أسود': '#0f172a', 'ذهبي': '#d4af37', 'فضي': '#c0c0c0'
-                    };
-                    let primary = '#2563eb';
-                    let bg = '#ffffff';
-                    
-                    Object.keys(colorMap).forEach(key => {
-                        if (input.includes(key)) {
-                            if (key === 'أبيض' || key === 'أسود') bg = colorMap[key];
-                            else primary = colorMap[key];
-                        }
-                    });
+<!-- Main Layout -->
 
-                    // 3. تحديد نوع النشاط
-                    let type = "متجر إلكتروني";
-                    let emoji = "📦";
-                    if (input.includes("عطور")) { type = "عطور فاخرة"; emoji = "🧴"; }
-                    else if (input.includes("اشتراك")) { type = "اشتراكات رقمية"; emoji = "⚡"; }
-                    else if (input.includes("كتب")) { type = "مكتبة سيادية"; emoji = "📚"; }
+<div class="main-layout">
 
-                    // البناء
-                    canvas.innerHTML = `
-                        <div style="background: ${bg}; color: ${bg === '#0f172a' ? '#fff' : '#000'}; min-height: 100%; transition: 0.3s;" dir="rtl" class="p-8">
-                            <nav class="flex justify-between items-center mb-8 border-b pb-4" style="border-color: ${primary}44">
-                                <h2 class="text-2xl font-black" style="color: ${primary}">${storeName}</h2>
-                                <span class="text-xs opacity-50 font-bold tracking-tighter">${type}</span>
-                            </nav>
-                            
-                            <div class="rounded-[30px] p-12 mb-8 text-center shadow-2xl" style="background: ${primary}; color: ${primary === '#ffffff' ? '#000' : '#fff'}">
-                                <h1 class="text-4xl font-black mb-2 italic tracking-tighter">${storeName}</h1>
-                                <p class="opacity-80 text-sm font-bold uppercase tracking-widest">أهلاً بك في وجهتك المفضلة لـ ${type}</p>
-                            </div>
+  <!-- Sidebar -->
 
-                            <div class="grid grid-cols-2 gap-4">
-                                ${[1, 2].map(i => `
-                                    <div class="bg-white/5 p-6 rounded-[30px] border border-gray-100 shadow-sm" style="background: ${bg === '#0f172a' ? '#1e293b' : '#ffffff'}">
-                                        <div class="h-32 rounded-2xl mb-4 flex items-center justify-center text-4xl bg-black/5">${emoji}</div>
-                                        <h3 class="font-black text-lg mb-4">منتج من ${storeName}</h3>
-                                        <button class="w-full py-4 rounded-2xl font-black text-white shadow-lg" style="background: ${primary}">إضافة 🛒</button>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
+  <div class="sidebar">
+    <div class="sidebar-title">أمثلة جاهزة</div>
 
-                    const endTime = performance.now();
-                    const duration = (endTime - startTime).toFixed(2);
-                    timerDisp.innerText = `LAST BUILD: ${duration} MS | ACCURACY: HIGH`;
-                }
-            }
+```
+<div class="example-item active" onclick="loadExample('basic')">
+  <div class="ex-name">🏪 متجر أساسي</div>
+  <div class="ex-desc">تعريف منتجات وعرضها</div>
+</div>
+<div class="example-item" onclick="loadExample('discount')">
+  <div class="ex-name">💰 نظام الخصومات</div>
+  <div class="ex-desc">حسابات الأسعار والخصومات</div>
+</div>
+<div class="example-item" onclick="loadExample('cart')">
+  <div class="ex-name">🛒 سلة التسوق</div>
+  <div class="ex-desc">إضافة منتجات وحساب الإجمالي</div>
+</div>
+<div class="example-item" onclick="loadExample('inventory')">
+  <div class="ex-name">📦 إدارة المخزون</div>
+  <div class="ex-desc">تتبع الكميات والتنبيهات</div>
+</div>
+<div class="example-item" onclick="loadExample('customer')">
+  <div class="ex-name">👤 بيانات العميل</div>
+  <div class="ex-desc">تعريف العملاء والطلبات</div>
+</div>
+<div class="example-item" onclick="loadExample('report')">
+  <div class="ex-name">📊 تقرير المبيعات</div>
+  <div class="ex-desc">إحصائيات وتقارير</div>
+</div>
+```
+
+  </div>
+
+  <!-- Editor -->
+
+  <div class="editor-panel">
+    <div class="editor-header">
+      <div class="editor-tabs">
+        <div class="editor-tab active">main.ssc</div>
+        <div class="editor-tab" style="color: var(--muted); font-size: 11px;">ShopScript</div>
+      </div>
+      <button class="run-btn" onclick="runCode()">
+        <span>▶</span> تشغيل
+      </button>
+    </div>
+    <div class="editor-wrapper">
+      <div id="highlightLayer"></div>
+      <textarea id="codeEditor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      <div class="line-numbers" id="lineNumbers"></div>
+    </div>
+  </div>
+
+  <!-- Output -->
+
+  <div class="output-panel">
+    <div class="output-header">
+      <span>مخرجات البرنامج</span>
+      <div class="output-status" id="statusDot"></div>
+    </div>
+    <div id="outputArea">
+      <div class="output-line dim">// اضغط "تشغيل" لتنفيذ الكود...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Docs -->
+
+<div class="docs-section">
+  <div class="docs-title">توثيق <span>ShopScript</span></div>
+  <div class="docs-subtitle">كل ما تحتاجه لبناء منطق متجرك الإلكتروني</div>
+
+  <div class="docs-grid">
+
+```
+<div class="doc-card">
+  <div class="doc-card-header">
+    <div class="doc-card-icon" style="background: rgba(255,107,53,0.15);">📦</div>
+    <div class="doc-card-title">تعريف المنتج — <code style="color:var(--keyword)">product</code></div>
+  </div>
+  <div class="doc-card-body">أنشئ منتجاً بجميع خصائصه التجارية بكلمة واحدة.</div>
+  <div class="code-snippet">
+    <span class="kw">product</span> عطر_سهيل {<br>
+    &nbsp;&nbsp;<span class="kw">price</span>: <span class="num">450</span><br>
+    &nbsp;&nbsp;<span class="kw">currency</span>: <span class="str">"SAR"</span><br>
+    &nbsp;&nbsp;<span class="kw">stock</span>: <span class="num">100</span><br>
+    &nbsp;&nbsp;<span class="kw">category</span>: <span class="str">"عطور"</span><br>
+    }
+  </div>
+</div>
+
+<div class="doc-card">
+  <div class="doc-card-header">
+    <div class="doc-card-icon" style="background: rgba(0,212,255,0.15);">🛒</div>
+    <div class="doc-card-title">سلة التسوق — <code style="color:var(--accent)">cart</code></div>
+  </div>
+  <div class="doc-card-body">أنشئ سلة تسوق وأضف منتجات بكميات مختلفة.</div>
+  <div class="code-snippet">
+    <span class="kw">cart</span> سلتي {}<br>
+    <span class="fn">add</span>(سلتي, عطر_سهيل, <span class="num">2</span>)<br>
+    <span class="fn">checkout</span>(سلتي)
+  </div>
+</div>
+
+<div class="doc-card">
+  <div class="doc-card-header">
+    <div class="doc-card-icon" style="background: rgba(255,215,0,0.15);">💰</div>
+    <div class="doc-card-title">الخصومات — <code style="color:var(--gold)">discount</code></div>
+  </div>
+  <div class="doc-card-body">طبّق خصومات بنسب مئوية أو قيم ثابتة على أي منتج.</div>
+  <div class="code-snippet">
+    <span class="kw">discount</span> عرض_الصيف {<br>
+    &nbsp;&nbsp;<span class="kw">percent</span>: <span class="num">20</span><br>
+    &nbsp;&nbsp;<span class="kw">apply_to</span>: <span class="str">"عطور"</span><br>
+    }
+  </div>
+</div>
+
+<div class="doc-card">
+  <div class="doc-card-header">
+    <div class="doc-card-icon" style="background: rgba(57,255,107,0.15);">👤</div>
+    <div class="doc-card-title">العميل — <code style="color:var(--accent3)">customer</code></div>
+  </div>
+  <div class="doc-card-body">عرّف بيانات العميل ومستوى عضويته بسهولة.</div>
+  <div class="code-snippet">
+    <span class="kw">customer</span> أحمد {<br>
+    &nbsp;&nbsp;<span class="kw">tier</span>: <span class="str">"VIP"</span><br>
+    &nbsp;&nbsp;<span class="kw">loyalty_points</span>: <span class="num">500</span><br>
+    }
+  </div>
+</div>
+
+<div class="doc-card">
+  <div class="doc-card-header">
+    <div class="doc-card-icon" style="background: rgba(199,146,234,0.15);">📊</div>
+    <div class="doc-card-title">الطباعة والتقارير — <code style="color:var(--func)">show / report</code></div>
+  </div>
+  <div class="doc-card-body">اعرض أي قيمة أو أنشئ تقرير مبيعات كامل.</div>
+  <div class="code-snippet">
+    <span class="fn">show</span>(عطر_سهيل.price)<br>
+    <span class="fn">report</span>(سلتي)<br>
+    <span class="fn">show</span>(<span class="str">"إجمالي المبيعات"</span>)
+  </div>
+</div>
+
+<div class="doc-card">
+  <div class="doc-card-header">
+    <div class="doc-card-icon" style="background: rgba(255,71,87,0.15);">🔁</div>
+    <div class="doc-card-title">الشرط والتكرار — <code style="color:var(--error)">if / loop</code></div>
+  </div>
+  <div class="doc-card-body">منطق برمجي كامل داخل سياق المتجر.</div>
+  <div class="code-snippet">
+    <span class="kw">if</span> (عطر_سهيل.stock &gt; <span class="num">0</span>) {<br>
+    &nbsp;&nbsp;<span class="fn">show</span>(<span class="str">"متوفر"</span>)<br>
+    } <span class="kw">else</span> {<br>
+    &nbsp;&nbsp;<span class="fn">show</span>(<span class="str">"نفذ المخزون"</span>)<br>
+    }
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+// =============================================
+// ShopScript Interpreter — كامل ومبني من الصفر
+// =============================================
+
+const EXAMPLES = {
+  basic: `// مرحباً بك في ShopScript 🛒
+// لغة برمجة مخصصة للمتاجر الإلكترونية
+
+product عطر_سهيل {
+  name: "سهيل إيليت"
+  price: 450
+  currency: "SAR"
+  stock: 100
+  category: "عطور فاخرة"
+  sku: "SUH-001"
+}
+
+product ساعة_فاخرة {
+  name: "ساعة الذهب"
+  price: 2800
+  currency: "SAR"
+  stock: 15
+  category: "ساعات"
+  sku: "WTC-007"
+}
+
+show("=== كتالوج المنتجات ===")
+show(عطر_سهيل.name)
+show(عطر_سهيل.price)
+show(ساعة_فاخرة.name)
+show(ساعة_فاخرة.price)`,
+
+  discount: `// نظام الخصومات في ShopScript
+
+product كريم_البشرة {
+  name: "كريم اللؤلؤ"
+  price: 320
+  currency: "SAR"
+  stock: 50
+  category: "عناية"
+}
+
+discount عرض_الجمعة {
+  percent: 30
+  apply_to: "عناية"
+  min_order: 200
+}
+
+discount عرض_vip {
+  fixed: 50
+  apply_to: "كريم_البشرة"
+}
+
+show("السعر الأصلي:")
+show(كريم_البشرة.price)
+
+apply_discount(كريم_البشرة, عرض_الجمعة)
+apply_discount(كريم_البشرة, عرض_vip)`,
+
+  cart: `// سلة التسوق في ShopScript
+
+product قهوة_عربية {
+  name: "قهوة الشمال"
+  price: 85
+  currency: "SAR"
+  stock: 200
+  category: "مشروبات"
+}
+
+product تمر_مجدول {
+  name: "تمر المدينة"
+  price: 120
+  currency: "SAR"
+  stock: 80
+  category: "تمور"
+}
+
+cart سلة_العميل {}
+
+add(سلة_العميل, قهوة_عربية, 3)
+add(سلة_العميل, تمر_مجدول, 2)
+
+show("=== سلة التسوق ===")
+report(سلة_العميل)
+checkout(سلة_العميل)`,
+
+  inventory: `// إدارة المخزون في ShopScript
+
+product عود_بخور {
+  name: "عود الهند"
+  price: 750
+  currency: "SAR"
+  stock: 8
+  category: "بخور"
+  low_stock_alert: 10
+}
+
+product ورد_طائف {
+  name: "ورد الطائف الأصلي"
+  price: 1200
+  currency: "SAR"
+  stock: 3
+  category: "عطور"
+  low_stock_alert: 5
+}
+
+show("=== فحص المخزون ===")
+
+if (عود_بخور.stock < عود_بخور.low_stock_alert) {
+  show("⚠️ تحذير: مخزون منخفض في عود_بخور")
+} else {
+  show("✅ مخزون عود البخور كافٍ")
+}
+
+if (ورد_طائف.stock < ورد_طائف.low_stock_alert) {
+  show("⚠️ تحذير: مخزون منخفض في ورد_طائف")
+}
+
+restock(عود_بخور, 50)
+show("تم تحديث المخزون")`,
+
+  customer: `// بيانات العميل في ShopScript
+
+customer محمد_العتيبي {
+  name: "محمد العتيبي"
+  tier: "VIP"
+  loyalty_points: 1200
+  city: "الرياض"
+  total_orders: 15
+}
+
+product عباءة_مطرزة {
+  name: "عباءة الفصل"
+  price: 680
+  currency: "SAR"
+  stock: 25
+  category: "أزياء"
+}
+
+show("=== بيانات العميل ===")
+show(محمد_العتيبي.name)
+show(محمد_العتيبي.tier)
+show(محمد_العتيبي.loyalty_points)
+
+cart طلب_محمد {}
+add(طلب_محمد, عباءة_مطرزة, 1)
+report(طلب_محمد)`,
+
+  report: `// تقرير المبيعات في ShopScript
+
+product منتج1 { name: "عطر A" price: 300 currency: "SAR" stock: 50 category: "عطور" }
+product منتج2 { name: "كريم B" price: 150 currency: "SAR" stock: 80 category: "عناية" }
+product منتج3 { name: "بخور C" price: 500 currency: "SAR" stock: 20 category: "بخور" }
+
+cart مبيعات_اليوم {}
+add(مبيعات_اليوم, منتج1, 5)
+add(مبيعات_اليوم, منتج2, 12)
+add(مبيعات_اليوم, منتج3, 3)
+
+show("=== تقرير مبيعات اليوم ===")
+report(مبيعات_اليوم)
+
+sales_summary(مبيعات_اليوم)`
+};
+
+// --- Interpreter Core ---
+class ShopScriptInterpreter {
+  constructor() {
+    this.env = {};
+    this.output = [];
+  }
+
+  log(msg, type = 'info') {
+    this.output.push({ msg, type });
+  }
+
+  run(code) {
+    this.env = {};
+    this.output = [];
+
+    try {
+      const tokens = this.tokenize(code);
+      this.parse(tokens);
+    } catch (e) {
+      this.log('❌ خطأ: ' + e.message, 'error');
+    }
+
+    return this.output;
+  }
+
+  tokenize(code) {
+    // Remove comments
+    code = code.replace(/\/\/[^\n]*/g, '');
+    // Split into meaningful chunks
+    const tokens = [];
+    let i = 0;
+    while (i < code.length) {
+      // Skip whitespace
+      if (/\s/.test(code[i])) { i++; continue; }
+      // String
+      if (code[i] === '"') {
+        let j = i + 1;
+        while (j < code.length && code[j] !== '"') j++;
+        tokens.push({ type: 'STRING', value: code.slice(i+1, j) });
+        i = j + 1;
+        continue;
+      }
+      // Number
+      if (/[0-9]/.test(code[i])) {
+        let j = i;
+        while (j < code.length && /[0-9.]/.test(code[j])) j++;
+        tokens.push({ type: 'NUMBER', value: parseFloat(code.slice(i, j)) });
+        i = j;
+        continue;
+      }
+      // Symbols
+      if ('{}(),.:<>!'.includes(code[i])) {
+        // Handle >= <=
+        if ((code[i] === '>' || code[i] === '<' || code[i] === '!') && code[i+1] === '=') {
+          tokens.push({ type: 'OP', value: code[i] + '=' });
+          i += 2;
+        } else {
+          tokens.push({ type: 'SYM', value: code[i] });
+          i++;
         }
-    </script>
+        continue;
+      }
+      // Word / identifier / keyword
+      if (/[\u0600-\u06FFa-zA-Z_]/.test(code[i])) {
+        let j = i;
+        while (j < code.length && /[\u0600-\u06FFa-zA-Z0-9_]/.test(code[j])) j++;
+        tokens.push({ type: 'WORD', value: code.slice(i, j) });
+        i = j;
+        continue;
+      }
+      i++;
+    }
+    return tokens;
+  }
+
+  parse(tokens) {
+    let i = 0;
+
+    const peek = () => tokens[i];
+    const consume = () => tokens[i++];
+    const expect = (type, val) => {
+      const t = tokens[i++];
+      if (!t) throw new Error(`توقعت ${val || type} لكن انتهى الكود`);
+      if (val && t.value !== val) throw new Error(`توقعت "${val}" لكن وجدت "${t.value}"`);
+      return t;
+    };
+
+    // Parse a block { key: value ... }
+    const parseBlock = () => {
+      const obj = {};
+      expect('SYM', '{');
+      while (peek() && peek().value !== '}') {
+        const key = consume().value;
+        if (peek() && peek().value === ':') consume(); // optional colon
+        const val = peek();
+        if (val && val.type === 'STRING') { obj[key] = val.value; consume(); }
+        else if (val && val.type === 'NUMBER') { obj[key] = val.value; consume(); }
+        else if (val && val.type === 'WORD') { obj[key] = val.value; consume(); }
+      }
+      expect('SYM', '}');
+      return obj;
+    };
+
+    // Parse an expression (for if conditions)
+    const parseCondition = () => {
+      expect('SYM', '(');
+      // left side: var or var.prop
+      let left;
+      const leftTok = consume();
+      if (peek() && peek().value === '.') {
+        consume();
+        const prop = consume().value;
+        left = () => {
+          const obj = this.env[leftTok.value];
+          return obj ? obj[prop] : 0;
+        };
+      } else {
+        left = () => leftTok.type === 'NUMBER' ? leftTok.value : (this.env[leftTok.value] || 0);
+      }
+
+      const op = consume();
+      let right;
+      const rightTok = consume();
+      if (peek() && peek().value === '.') {
+        consume();
+        const prop = consume().value;
+        right = () => {
+          const obj = this.env[rightTok.value];
+          return obj ? obj[prop] : 0;
+        };
+      } else {
+        right = () => rightTok.type === 'NUMBER' ? rightTok.value : (this.env[rightTok.value] || 0);
+      }
+
+      expect('SYM', ')');
+
+      return () => {
+        const l = left(), r = right();
+        switch(op.value) {
+          case '>': return l > r;
+          case '<': return l < r;
+          case '>=': return l >= r;
+          case '<=': return l <= r;
+          case '==': return l == r;
+          case '!=': return l != r;
+          default: return false;
+        }
+      };
+    };
+
+    // Parse argument list (...)
+    const parseArgs = () => {
+      expect('SYM', '(');
+      const args = [];
+      while (peek() && peek().value !== ')') {
+        const t = consume();
+        if (t.type === 'STRING') args.push(t.value);
+        else if (t.type === 'NUMBER') args.push(t.value);
+        else if (t.type === 'WORD') {
+          // Could be var.prop
+          if (peek() && peek().value === '.') {
+            consume();
+            const prop = consume().value;
+            args.push({ varRef: t.value, prop });
+          } else {
+            args.push({ varRef: t.value });
+          }
+        }
+        if (peek() && peek().value === ',') consume();
+      }
+      expect('SYM', ')');
+      return args;
+    };
+
+    const resolveArg = (arg) => {
+      if (typeof arg === 'string' || typeof arg === 'number') return arg;
+      if (arg.prop) {
+        const obj = this.env[arg.varRef];
+        return obj ? obj[arg.prop] : `[${arg.varRef}.${arg.prop}]`;
+      }
+      return this.env[arg.varRef] || arg.varRef;
+    };
+
+    // Parse block of statements
+    const parseStatements = () => {
+      expect('SYM', '{');
+      const stmts = [];
+      let depth = 1;
+      const blockTokens = [];
+      while (peek() && depth > 0) {
+        const t = consume();
+        if (t.value === '{') depth++;
+        if (t.value === '}') { depth--; if (depth === 0) break; }
+        blockTokens.push(t);
+      }
+      this.parse(blockTokens);
+    };
+
+    while (i < tokens.length) {
+      const tok = peek();
+      if (!tok) break;
+
+      // product
+      if (tok.type === 'WORD' && tok.value === 'product') {
+        consume();
+        const name = consume().value;
+        const props = parseBlock();
+        props._type = 'product';
+        this.env[name] = props;
+        this.log(`📦 تم تعريف المنتج: ${props.name || name}`, 'success');
+        continue;
+      }
+
+      // cart
+      if (tok.type === 'WORD' && tok.value === 'cart') {
+        consume();
+        const name = consume().value;
+        parseBlock();
+        this.env[name] = { _type: 'cart', items: [], name };
+        this.log(`🛒 تم إنشاء سلة: ${name}`, 'success');
+        continue;
+      }
+
+      // customer
+      if (tok.type === 'WORD' && tok.value === 'customer') {
+        consume();
+        const name = consume().value;
+        const props = parseBlock();
+        props._type = 'customer';
+        this.env[name] = props;
+        this.log(`👤 تم تسجيل العميل: ${props.name || name}`, 'success');
+        continue;
+      }
+
+      // discount
+      if (tok.type === 'WORD' && tok.value === 'discount') {
+        consume();
+        const name = consume().value;
+        const props = parseBlock();
+        props._type = 'discount';
+        this.env[name] = props;
+        this.log(`💰 تم تعريف الخصم: ${name}`, 'success');
+        continue;
+      }
+
+      // if / else
+      if (tok.type === 'WORD' && tok.value === 'if') {
+        consume();
+        const condition = parseCondition();
+        const result = condition();
+        
+        // Save position, parse the if block
+        expect('SYM', '{');
+        const ifTokens = [];
+        let depth = 1;
+        while (i < tokens.length && depth > 0) {
+          const t = consume();
+          if (t.value === '{') depth++;
+          if (t.value === '}') { depth--; if (depth === 0) break; }
+          ifTokens.push(t);
+        }
+
+        let elseTokens = [];
+        if (peek() && peek().value === 'else') {
+          consume();
+          expect('SYM', '{');
+          let depth2 = 1;
+          while (i < tokens.length && depth2 > 0) {
+            const t = consume();
+            if (t.value === '{') depth2++;
+            if (t.value === '}') { depth2--; if (depth2 === 0) break; }
+            elseTokens.push(t);
+          }
+        }
+
+        if (result) this.parse(ifTokens);
+        else if (elseTokens.length > 0) this.parse(elseTokens);
+        continue;
+      }
+
+      // Functions
+      if (tok.type === 'WORD') {
+        const fnName = tok.value;
+
+        if (fnName === 'show') {
+          consume();
+          const args = parseArgs();
+          const val = resolveArg(args[0]);
+          if (typeof val === 'object' && val !== null) {
+            this.log(`📋 ${JSON.stringify(val)}`, 'data');
+          } else {
+            this.log(`${val}`, 'info');
+          }
+          continue;
+        }
+
+        if (fnName === 'add') {
+          consume();
+          const args = parseArgs();
+          const cartRef = args[0]?.varRef || args[0];
+          const prodRef = args[1]?.varRef || args[1];
+          const qty = args[2] || 1;
+
+          const cart = this.env[cartRef];
+          const prod = this.env[prodRef];
+
+          if (!cart || cart._type !== 'cart') throw new Error(`${cartRef} ليس سلة تسوق`);
+          if (!prod || prod._type !== 'product') throw new Error(`${prodRef} ليس منتجاً`);
+
+          const quantity = typeof qty === 'number' ? qty : (resolveArg(qty) || 1);
+          cart.items.push({ product: prod, qty: quantity, ref: prodRef });
+          this.log(`✅ تمت الإضافة: ${prod.name || prodRef} × ${quantity}`, 'success');
+          continue;
+        }
+
+        if (fnName === 'report') {
+          consume();
+          const args = parseArgs();
+          const cartRef = args[0]?.varRef || args[0];
+          const cart = this.env[cartRef];
+          if (!cart) throw new Error(`لا يوجد متغير بالاسم: ${cartRef}`);
+
+          if (cart._type === 'cart') {
+            this.log(``, 'dim');
+            this.log(`┌─ تقرير السلة: ${cartRef}`, 'section');
+            let total = 0;
+            for (const item of cart.items) {
+              const subtotal = item.product.price * item.qty;
+              total += subtotal;
+              const curr = item.product.currency || 'SAR';
+              this.log(`│  ${item.product.name || item.ref} × ${item.qty} = ${subtotal} ${curr}`, 'data');
+            }
+            this.log(`└─ الإجمالي: ${total} ${cart.items[0]?.product.currency || 'SAR'}`, 'price');
+          }
+          continue;
+        }
+
+        if (fnName === 'checkout') {
+          consume();
+          const args = parseArgs();
+          const cartRef = args[0]?.varRef || args[0];
+          const cart = this.env[cartRef];
+          if (!cart || cart._type !== 'cart') throw new Error(`${cartRef} ليس سلة`);
+
+          let total = cart.items.reduce((s, i) => s + i.product.price * i.qty, 0);
+          const curr = cart.items[0]?.product.currency || 'SAR';
+          this.log(``, 'dim');
+          this.log(`💳 إتمام الشراء`, 'section');
+          this.log(`   عدد المنتجات: ${cart.items.reduce((s,i)=>s+i.qty,0)}`, 'data');
+          this.log(`   إجمالي الدفع: ${total} ${curr}`, 'price');
+          this.log(`✅ تم تأكيد الطلب بنجاح!`, 'success');
+          continue;
+        }
+
+        if (fnName === 'apply_discount') {
+          consume();
+          const args = parseArgs();
+          const prodRef = args[0]?.varRef || args[0];
+          const discRef = args[1]?.varRef || args[1];
+
+          const prod = this.env[prodRef];
+          const disc = this.env[discRef];
+
+          if (!prod) throw new Error(`لا يوجد منتج: ${prodRef}`);
+          if (!disc) throw new Error(`لا يوجد خصم: ${discRef}`);
+
+          const origPrice = prod.price;
+          let newPrice = origPrice;
+
+          if (disc.percent) newPrice = origPrice * (1 - disc.percent / 100);
+          if (disc.fixed) newPrice = newPrice - disc.fixed;
+          newPrice = Math.max(0, Math.round(newPrice));
+
+          const curr = prod.currency || 'SAR';
+          this.log(`💰 تطبيق الخصم "${discRef}" على "${prod.name || prodRef}"`, 'section');
+          this.log(`   قبل الخصم: ${origPrice} ${curr}`, 'data');
+          this.log(`   بعد الخصم: ${newPrice} ${curr}`, 'price');
+          prod.price = newPrice;
+          continue;
+        }
+
+        if (fnName === 'restock') {
+          consume();
+          const args = parseArgs();
+          const prodRef = args[0]?.varRef || args[0];
+          const qty = typeof args[1] === 'number' ? args[1] : (resolveArg(args[1]) || 0);
+
+          const prod = this.env[prodRef];
+          if (!prod) throw new Error(`لا يوجد منتج: ${prodRef}`);
+
+          const oldStock = prod.stock || 0;
+          prod.stock = oldStock + qty;
+          this.log(`📦 تجديد مخزون "${prod.name || prodRef}": ${oldStock} → ${prod.stock}`, 'success');
+          continue;
+        }
+
+        if (fnName === 'sales_summary') {
+          consume();
+          const args = parseArgs();
+          const cartRef = args[0]?.varRef || args[0];
+          const cart = this.env[cartRef];
+          if (!cart || cart._type !== 'cart') throw new Error(`${cartRef} ليس سلة`);
+
+          const categoryMap = {};
+          for (const item of cart.items) {
+            const cat = item.product.category || 'أخرى';
+            categoryMap[cat] = (categoryMap[cat] || 0) + item.product.price * item.qty;
+          }
+
+          this.log(``, 'dim');
+          this.log(`📊 ملخص المبيعات`, 'section');
+          for (const [cat, total] of Object.entries(categoryMap)) {
+            this.log(`   ${cat}: ${total} SAR`, 'data');
+          }
+          const grand = Object.values(categoryMap).reduce((a,b)=>a+b,0);
+          this.log(`   ─────────────`, 'dim');
+          this.log(`   الإجمالي الكلي: ${grand} SAR`, 'price');
+          continue;
+        }
+
+        // Unknown word - skip
+        consume();
+      } else {
+        consume();
+      }
+    }
+  }
+}
+
+// =============================================
+// UI Logic
+// =============================================
+
+const interpreter = new ShopScriptInterpreter();
+const editor = document.getElementById('codeEditor');
+const highlight = document.getElementById('highlightLayer');
+const output = document.getElementById('outputArea');
+const statusDot = document.getElementById('statusDot');
+const lineNums = document.getElementById('lineNumbers');
+
+const KEYWORDS = ['product','cart','customer','discount','if','else','show','add','checkout','report','apply_discount','restock','sales_summary'];
+const PROPS = ['price','stock','category','name','currency','tier','loyalty_points','percent','fixed','apply_to','sku','city','total_orders','low_stock_alert','min_order'];
+
+function syntaxHighlight(code) {
+  let html = code
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+
+  // Strings
+  html = html.replace(/"([^"]*)"/g, '<span style="color:var(--string)">"$1"</span>');
+  // Numbers
+  html = html.replace(/\b(\d+\.?\d*)\b/g, '<span style="color:var(--number)">$1</span>');
+  // Comments
+  html = html.replace(/(\/\/[^\n]*)/g, '<span style="color:var(--comment)">$1</span>');
+  // Keywords
+  KEYWORDS.forEach(kw => {
+    html = html.replace(new RegExp(`\\b(${kw})\\b`, 'g'), `<span style="color:var(--keyword);font-weight:700">$1</span>`);
+  });
+  // Properties
+  PROPS.forEach(p => {
+    html = html.replace(new RegExp(`\\b(${p})\\b`, 'g'), `<span style="color:var(--func)">$1</span>`);
+  });
+
+  return html;
+}
+
+function updateHighlight() {
+  highlight.innerHTML = syntaxHighlight(editor.value);
+  updateLineNumbers();
+}
+
+function updateLineNumbers() {
+  const lines = editor.value.split('\n').length;
+  lineNums.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+}
+
+editor.addEventListener('input', updateHighlight);
+editor.addEventListener('scroll', () => {
+  highlight.scrollTop = editor.scrollTop;
+  highlight.scrollLeft = editor.scrollLeft;
+});
+
+editor.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
+    editor.selectionStart = editor.selectionEnd = start + 2;
+    updateHighlight();
+  }
+});
+
+function runCode() {
+  statusDot.className = 'output-status running';
+  output.innerHTML = '<div class="output-line dim">// جاري التنفيذ...</div>';
+
+  setTimeout(() => {
+    const results = interpreter.run(editor.value);
+    output.innerHTML = '';
+
+    if (results.length === 0) {
+      output.innerHTML = '<div class="output-line dim">// لا توجد مخرجات</div>';
+    } else {
+      for (const line of results) {
+        const div = document.createElement('div');
+        div.className = `output-line ${line.type}`;
+        div.textContent = line.msg;
+        output.appendChild(div);
+      }
+    }
+
+    const hasError = results.some(r => r.type === 'error');
+    statusDot.className = `output-status ${hasError ? 'error' : 'success'}`;
+    output.scrollTop = output.scrollHeight;
+  }, 150);
+}
+
+function loadExample(name) {
+  document.querySelectorAll('.example-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  editor.value = EXAMPLES[name] || '';
+  updateHighlight();
+  output.innerHTML = '<div class="output-line dim">// اضغط "تشغيل" لتنفيذ الكود...</div>';
+  statusDot.className = 'output-status';
+}
+
+// Init
+editor.value = EXAMPLES.basic;
+updateHighlight();
+</script>
+
 </body>
 </html>
