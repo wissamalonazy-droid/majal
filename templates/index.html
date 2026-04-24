@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAJAL PRO | NUCLEUS</title>
+    <title>MAJAL PRO | PURE NUCLEUS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -12,48 +12,34 @@
         .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
         #majal-editor { font-family: 'Fira Code', monospace; background: transparent; border: none; outline: none; resize: none; color: #93c5fd; font-size: 16px; width: 100%; height: 100%; padding: 25px; }
         #live-canvas { background: #ffffff; color: #000; border-radius: 20px; width: 100%; height: 100%; overflow: auto; border: 2px solid #1e293b; }
-        .color-dot { width: 15px; height: 15px; border-radius: 50%; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.2); }
-        .color-dot:hover { transform: scale(1.3); }
         [x-cloak] { display: none !important; }
     </style>
 </head>
 <body x-data="majalApp()" x-init="init()" :dir="lang === 'ar' ? 'rtl' : 'ltr'">
 
-    <header class="h-[60px] flex items-center justify-between px-8 bg-black/60 border-b border-white/5 z-50 shadow-2xl">
+    <header class="h-[65px] flex items-center justify-between px-8 bg-black/60 border-b border-white/5 z-50">
         <div class="flex items-center gap-6">
-            <button @click="menuOpen = true" class="text-2xl text-blue-500 hover:rotate-90 transition-all duration-300">•••</button>
+            <button @click="menuOpen = true" class="text-2xl text-blue-500 hover:scale-110 transition-all">•••</button>
             <h1 class="text-2xl font-black italic text-blue-500 tracking-tighter">MAJAL <span class="text-white font-light text-sm italic">PRO</span></h1>
         </div>
         
         <div class="flex items-center gap-4">
-            <div class="flex gap-2 bg-white/5 p-2 rounded-full border border-white/10">
-                <div @click="addColor('#2563eb')" class="color-dot bg-blue-600"></div>
-                <div @click="addColor('#ef4444')" class="color-dot bg-red-600"></div>
-                <div @click="addColor('#10b981')" class="color-dot bg-green-600"></div>
-                <div @click="addColor('#f59e0b')" class="color-dot bg-amber-500"></div>
-            </div>
-            <button @click="formatCode()" class="bg-blue-600 px-4 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-blue-900/40 hover:bg-blue-500 transition">🧹 تنسيق</button>
+            <button @click="formatCode()" class="bg-blue-600 px-6 py-2 rounded-xl text-xs font-bold shadow-lg shadow-blue-900/40 hover:bg-blue-500 transition-all">🧹 تنسيق الكود</button>
         </div>
     </header>
 
-    <main class="flex flex-col h-[calc(100vh-60px)] p-4 gap-4 bg-[#020617]">
-        
+    <main class="flex flex-col h-[calc(100vh-65px)] p-4 gap-4 bg-[#020617]">
         <div class="flex-1 glass rounded-[30px] flex flex-col overflow-hidden shadow-xl">
             <div class="px-6 py-2 bg-white/5 border-b border-white/5 flex justify-between items-center text-[10px] font-black text-blue-500 tracking-widest uppercase">
-                <span>المحرر السيادي</span>
-                <span class="text-gray-600">v2.4</span>
+                <span x-text="lang === 'ar' ? 'المحرر السيادي' : 'SOVEREIGN EDITOR'"></span>
             </div>
-            <textarea id="majal-editor" @input="onInput($event)" placeholder="// اكتب كودك هنا..."></textarea>
+            <textarea id="majal-editor" @input="onInput($event)" :placeholder="lang === 'ar' ? '// اكتب كودك هنا...' : '// Start coding here...'"></textarea>
         </div>
 
         <div class="flex-1 glass rounded-[30px] flex flex-col overflow-hidden shadow-2xl">
             <div class="px-6 py-2 border-b border-white/5 bg-white/5 flex justify-between items-center text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                <span>المعاينة اللحظية</span>
-                <div class="flex gap-1">
-                    <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
-                    <div class="w-2 h-2 rounded-full bg-yellow-500/50"></div>
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                </div>
+                <span x-text="lang === 'ar' ? 'المعاينة اللحظية' : 'LIVE PREVIEW'"></span>
+                <span class="text-green-500 animate-pulse text-[8px]">● ACTIVE</span>
             </div>
             <div class="flex-1 p-4 overflow-hidden">
                 <div id="live-canvas"></div>
@@ -62,32 +48,35 @@
     </main>
 
     <div x-show="menuOpen" class="fixed inset-0 bg-black/80 z-[99]" @click="menuOpen = false" x-cloak x-transition.opacity></div>
-    <div x-show="menuOpen" class="fixed top-0 bottom-0 w-[280px] bg-[#050505] p-10 flex flex-col z-[100] transition-transform duration-300" :class="lang === 'ar' ? 'right-0 border-l border-white/10' : 'left-0 border-r border-white/10'" x-cloak :style="menuOpen ? 'transform: translateX(0)' : (lang === 'ar' ? 'transform: translateX(100%)' : 'transform: translateX(-100%)')">
+    <div x-show="menuOpen" class="fixed top-0 bottom-0 w-[300px] bg-[#050505] p-10 flex flex-col z-[100] transition-transform duration-300 shadow-2xl" 
+         :class="lang === 'ar' ? 'right-0 border-l border-white/10' : 'left-0 border-r border-white/10'" 
+         x-cloak :style="menuOpen ? 'transform: translateX(0)' : (lang === 'ar' ? 'transform: translateX(100%)' : 'transform: translateX(-100%)')">
+        
         <nav class="flex-1 space-y-6 pt-10">
-            <button @click="activeModal = 'profile'; menuOpen = false" class="w-full text-right p-3 hover:text-blue-500 transition font-black flex justify-between items-center text-sm border-b border-white/5 pb-4">
-                <span>الملف الشخصي</span> <span>👤</span>
+            <button @click="activeModal = 'profile'; menuOpen = false" class="w-full text-right p-4 hover:bg-white/5 transition font-black flex justify-between items-center text-sm border-b border-white/5">
+                <span x-text="lang === 'ar' ? 'الملف الشخصي' : 'Profile'"></span> 👤
             </button>
-            <button @click="activeModal = 'about'; menuOpen = false" class="w-full text-right p-3 hover:text-blue-500 transition font-black flex justify-between items-center text-sm border-b border-white/5 pb-4">
-                <span>من نحن</span> <span>ℹ️</span>
+            <button @click="activeModal = 'about'; menuOpen = false" class="w-full text-right p-4 hover:bg-white/5 transition font-black flex justify-between items-center text-sm border-b border-white/5">
+                <span x-text="lang === 'ar' ? 'من نحن' : 'About Us'"></span> ℹ️
             </button>
-            <button @click="lang = (lang === 'ar' ? 'en' : 'ar'); menuOpen = false" class="w-full text-right p-3 hover:text-blue-500 transition font-black flex justify-between items-center text-sm">
-                <span x-text="lang === 'ar' ? 'English' : 'العربية'"></span> 🌐
+            
+            <button @click="toggleLang()" class="w-full text-right p-4 hover:bg-white/5 transition font-black flex justify-between items-center text-sm border border-white/10 rounded-2xl">
+                <span x-text="lang === 'ar' ? 'Switch to English' : 'التحويل للعربية'"></span> 🌐
             </button>
-            <button @click="exportProject()" class="w-full text-right p-4 rounded-2xl bg-green-600/10 text-green-400 border border-green-500/20 font-black flex justify-between items-center mt-10">
-                <span>تصدير المشروع</span> 📥
+
+            <button @click="exportProject()" class="w-full text-right p-4 rounded-2xl bg-green-600/10 text-green-400 border border-green-500/20 font-black flex justify-between items-center mt-6">
+                <span x-text="lang === 'ar' ? 'تصدير المشروع' : 'Export Project'"></span> 📥
             </button>
         </nav>
-        <div class="mt-auto text-center border-t border-white/5 pt-6 text-[9px] font-black text-gray-700 uppercase tracking-widest font-mono">MADE IN SAUDI ARABIA 🇸🇦</div>
+        <div class="mt-auto text-center border-t border-white/5 pt-6 text-[9px] font-black text-gray-700 uppercase tracking-widest">MADE IN SAUDI ARABIA 🇸🇦</div>
     </div>
 
     <template x-if="activeModal">
         <div class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6" @click.self="activeModal = null">
-            <div class="w-full max-w-md glass p-12 rounded-[50px] text-center border border-blue-500/20 relative">
-                <button @click="activeModal = null" class="absolute top-6 left-6 text-gray-500 hover:text-white">✕</button>
-                <div class="w-20 h-20 bg-blue-600/20 rounded-3xl mx-auto mb-6 flex items-center justify-center text-3xl">🛡️</div>
-                <h2 class="text-2xl font-black mb-4 text-blue-500" x-text="activeModal === 'profile' ? 'هوية المطور' : 'عن مَجال'"></h2>
-                <p class="text-gray-300 leading-relaxed mb-8" x-text="activeModal === 'profile' ? 'أنت الآن في بيئة تطوير مشفرة وسيادية. كل أكوادك محفوظة محلياً.' : 'مَجال هو مشروع طموح لبناء محرك برمجي عربي متكامل ينافس المنصات العالمية.'"></p>
-                <button @click="activeModal = null" class="bg-blue-600 w-full py-4 rounded-2xl font-black shadow-xl shadow-blue-900/40">استمرار العمل</button>
+            <div class="w-full max-w-md glass p-12 rounded-[50px] text-center border border-blue-500/20">
+                <h2 class="text-2xl font-black mb-4 text-blue-500" x-text="activeModal === 'profile' ? (lang === 'ar' ? 'هوية المطور' : 'Developer Identity') : (lang === 'ar' ? 'عن مَجال' : 'About Majal')"></h2>
+                <p class="text-gray-300 leading-relaxed mb-8" x-text="activeModal === 'profile' ? (lang === 'ar' ? 'أنت المطور السيادي لهذا النظام.' : 'You are the sovereign developer of this system.') : (lang === 'ar' ? 'مَجال هو محرك برمجي عربي متكامل.' : 'Majal is a comprehensive Arabic programming engine.')"></p>
+                <button @click="activeModal = null" class="bg-blue-600 w-full py-4 rounded-2xl font-black">إغلاق</button>
             </div>
         </div>
     </template>
@@ -97,24 +86,23 @@
             return {
                 menuOpen: false, lang: 'ar', activeModal: null,
                 init() {
-                    const saved = localStorage.getItem('majal_v24');
+                    const saved = localStorage.getItem('majal_v25');
                     if(saved) { document.getElementById('majal-editor').value = saved; setTimeout(() => MajalCore.process(), 100); }
                 },
-                onInput(e) { localStorage.setItem('majal_v24', e.target.value); MajalCore.process(); },
+                onInput(e) { localStorage.setItem('majal_v25', e.target.value); MajalCore.process(); },
+                toggleLang() {
+                    this.lang = (this.lang === 'ar' ? 'en' : 'ar');
+                    this.menuOpen = false;
+                },
                 formatCode() {
                     const editor = document.getElementById('majal-editor');
                     editor.value = editor.value.split('\n').map(l => l.trim()).filter(l => l !== "").join('\n');
                     MajalCore.process();
                 },
-                addColor(hex) {
-                    const editor = document.getElementById('majal-editor');
-                    editor.setRangeText(hex, editor.selectionStart, editor.selectionEnd, 'end');
-                    MajalCore.process();
-                },
                 exportProject() {
                     const code = document.getElementById('live-canvas').innerHTML;
                     const blob = new Blob([code], {type: 'text/html'});
-                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'majal_index.html'; a.click();
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'majal_project.html'; a.click();
                 }
             }
         }
