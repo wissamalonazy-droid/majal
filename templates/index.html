@@ -3,101 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAJAL PRO</title>
+    <title>MAJAL PRO | ULTIMATE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
         html, body { height: 100%; margin: 0; overflow: hidden; background-color: #020617; color: white; font-family: 'Tajawal', sans-serif; }
         .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        #majal-editor { font-family: 'Fira Code', monospace; background: transparent; border: none; outline: none; resize: none; color: #93c5fd; font-size: 16px; width: 100%; height: 100%; padding: 20px; }
-        #live-canvas { background: #ffffff; color: #000; border-radius: 20px; width: 100%; height: 100%; overflow: auto; border: 4px solid #1e293b; }
-        .shortcut-btn { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 8px 15px; border-radius: 12px; font-size: 11px; font-weight: bold; transition: all 0.2s; }
-        .shortcut-btn:hover { background: #2563eb; color: white; transform: translateY(-2px); }
+        #majal-editor { font-family: 'Fira Code', monospace; background: transparent; border: none; outline: none; resize: none; color: #93c5fd; font-size: 15px; width: 100%; height: 100%; padding: 20px; }
+        #live-canvas { background: #ffffff; color: #000; border-radius: 25px; width: 100%; height: 100%; overflow: auto; border: 6px solid #1e293b; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .shortcut-btn { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: bold; transition: 0.2s; white-space: nowrap; }
+        .shortcut-btn:hover { background: #2563eb; color: white; }
         [x-cloak] { display: none !important; }
+        .suggest-box { background: #1e293b; border: 1px solid #334155; border-radius: 8px; position: absolute; z-index: 1000; box-shadow: 0 10px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
-<body x-data="{ 
-    menuOpen: false, 
-    mode: 'easy', 
-    lang: 'ar',
-    addShortcut(type) {
-        const editor = document.getElementById('majal-editor');
-        const templates = {
-            btn: '\n<button style=\'background:#2563eb; color:white; padding:10px 20px; border-radius:10px; border:none;\'>زر جديد</button>',
-            text: '\n<h1 style=\'color:#1e293b;\'>عنوان جديد هنا</h1>',
-            card: '\n<div style=\'padding:20px; border:1px solid #ddd; border-radius:15px; shadow:auto;\'>\n  <h3>كرت منتج</h3>\n  <p>وصف بسيط...</p>\n</div>'
-        };
-        editor.value += templates[type];
-        MajalCore.process(); // تحديث المعاينة فوراً
-    }
-}" :dir="lang === 'ar' ? 'rtl' : 'ltr'">
+<body x-data="majalApp()" x-init="init()">
 
     <header class="h-[65px] flex items-center justify-between px-8 bg-black/50 border-b border-white/5 z-50">
-        <div class="flex items-center gap-6">
-            <button @click="menuOpen = true" class="text-2xl text-blue-500">•••</button>
-            <h1 class="text-2xl font-black italic tracking-tighter text-blue-500">MAJAL <span class="text-white font-light text-sm">PRO</span></h1>
+        <div class="flex items-center gap-4">
+            <button @click="menuOpen = true" class="text-2xl text-blue-500 hover:scale-110 transition">•••</button>
+            <h1 class="text-xl font-black italic text-blue-500 tracking-tighter">MAJAL <span class="text-white font-light text-xs">PRO</span></h1>
         </div>
         
         <div class="bg-white/5 p-1 rounded-xl flex border border-white/10">
-            <button @click="mode = 'easy'" :class="mode === 'easy' ? 'bg-blue-600 text-white' : 'text-gray-500'" class="px-5 py-1.5 rounded-lg text-[10px] font-bold transition-all">سهل</button>
-            <button @click="mode = 'pro'" :class="mode === 'pro' ? 'bg-blue-600 text-white' : 'text-gray-500'" class="px-5 py-1.5 rounded-lg text-[10px] font-bold transition-all">معقد</button>
+            <button @click="mode = 'easy'" :class="mode === 'easy' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500'" class="px-5 py-1.5 rounded-lg text-[10px] font-bold transition-all">سهل</button>
+            <button @click="mode = 'pro'" :class="mode === 'pro' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500'" class="px-5 py-1.5 rounded-lg text-[10px] font-bold transition-all">معقد</button>
         </div>
     </header>
 
-    <div x-show="menuOpen" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[99]" @click="menuOpen = false" x-cloak x-transition.opacity></div>
-    <div x-show="menuOpen" class="fixed top-0 bottom-0 w-[300px] bg-[#050505] p-8 flex flex-col z-[100] transition-transform duration-300" 
-         :class="lang === 'ar' ? 'right-0 border-l border-white/10' : 'left-0 border-r border-white/10'"
-         x-cloak :style="menuOpen ? 'transform: translateX(0)' : (lang === 'ar' ? 'transform: translateX(100%)' : 'transform: translateX(-100%)')">
-        
-        <div class="mb-10">
-            <div class="w-14 h-14 rounded-2xl bg-blue-600 mb-4 flex items-center justify-center font-black text-2xl">M</div>
-            <h3 class="font-black text-xl">الملف الشخصي</h3>
-        </div>
-
-        <nav class="flex-1 space-y-4">
-            <button class="w-full text-right p-3 rounded-xl hover:bg-white/5 transition font-bold">الملف الشخصي</button>
-            <button class="w-full text-right p-3 rounded-xl hover:bg-white/5 transition font-bold">من نحن</button>
-            <button @click="lang = (lang === 'ar' ? 'en' : 'ar')" class="w-full text-right p-3 rounded-xl hover:bg-white/5 border border-white/10 font-bold flex justify-between items-center">
-                <span x-text="lang === 'ar' ? 'English' : 'العربية'"></span> 🌐
-            </button>
-        </nav>
-        
-        <div class="mt-auto text-center border-t border-white/5 pt-6">
-            <p class="text-[10px] font-black text-blue-500 tracking-widest uppercase">صُنع بالسعودية 🇸🇦</p>
-        </div>
-    </div>
-
     <main class="flex h-[calc(100vh-65px)] p-4 gap-4">
-        <div class="flex-1 glass rounded-[30px] flex flex-col overflow-hidden">
-            <div x-show="mode === 'easy'" x-transition class="px-6 py-3 bg-blue-500/5 border-b border-blue-500/10 flex gap-3 overflow-x-auto items-center">
-                <span class="text-[9px] font-black text-blue-400 uppercase ml-2">اختصارات:</span>
-                <button @click="addShortcut('btn')" class="shortcut-btn">+ إضافة زر</button>
-                <button @click="addShortcut('text')" class="shortcut-btn">+ إضافة عنوان</button>
-                <button @click="addShortcut('card')" class="shortcut-btn">+ إضافة كرت</button>
+        <div class="w-[40%] glass rounded-[30px] flex flex-col overflow-hidden relative">
+            
+            <div x-show="mode === 'easy'" class="px-4 py-2 bg-blue-500/5 border-b border-blue-500/10 flex gap-2 overflow-x-auto no-scrollbar items-center">
+                <span class="text-[9px] font-bold text-blue-400 ml-2 uppercase">بناء سريع:</span>
+                <button @click="addSection('header')" class="shortcut-btn">+ هيدر متجر</button>
+                <button @click="addSection('features')" class="shortcut-btn">+ مميزات</button>
+                <button @click="addSection('footer')" class="shortcut-btn">+ تذييل</button>
             </div>
 
-            <div class="px-6 py-2 bg-white/5 flex justify-between items-center border-b border-white/5">
-                <span class="text-[10px] font-black text-blue-500 uppercase" x-text="mode === 'easy' ? 'BEGINNER MODE' : 'PROFESSIONAL MODE'"></span>
+            <div x-show="mode === 'easy' && showSuggest" class="suggest-box p-2 w-48" :style="`top: ${suggestPos.y}px; left: ${suggestPos.x}px;`" x-cloak>
+                <div class="text-[9px] text-gray-500 mb-1 px-2 uppercase tracking-widest">مقترحات الذكاء:</div>
+                <template x-for="s in suggestions">
+                    <button @click="applySuggest(s)" class="w-full text-right p-2 text-xs hover:bg-blue-600 rounded-md transition" x-text="s"></button>
+                </template>
             </div>
-            
-            <textarea id="majal-editor" oninput="MajalCore.process()" placeholder="// اكتب كودك هنا..."></textarea>
+
+            <textarea id="majal-editor" @input="onInput($event)" placeholder="// اكتب كودك هنا..."></textarea>
         </div>
 
-        <div class="flex-1 glass rounded-[30px] flex flex-col overflow-hidden">
-            <div class="px-6 py-3 border-b border-white/5 bg-white/5 flex justify-between items-center text-[10px] font-black text-gray-500 uppercase">
-                <span>المعاينة الحية</span>
+        <div class="flex-1 glass rounded-[30px] flex flex-col overflow-hidden shadow-2xl">
+            <div class="px-6 py-2 border-b border-white/5 bg-white/5 flex justify-between items-center text-[10px] font-black text-gray-500 uppercase">
+                <span>Canvas / المعاينة الحية</span>
+                <span class="text-green-500 animate-pulse">● Live</span>
             </div>
-            <div class="flex-1 p-4 overflow-auto">
+            <div class="flex-1 p-6 overflow-hidden">
                 <div id="live-canvas"></div>
             </div>
         </div>
     </main>
 
+    <div x-show="menuOpen" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[99]" @click="menuOpen = false" x-cloak x-transition.opacity></div>
+    <div x-show="menuOpen" class="fixed top-0 bottom-0 w-[280px] bg-[#050505] p-8 flex flex-col z-[100] transition-transform duration-300" :class="lang === 'ar' ? 'right-0' : 'left-0'" x-cloak :style="menuOpen ? 'transform: translateX(0)' : (lang === 'ar' ? 'transform: translateX(100%)' : 'transform: translateX(-100%)')">
+        <nav class="flex-1 space-y-4 pt-10">
+            <button @click="activeModal = 'profile'; menuOpen = false" class="w-full text-right p-4 rounded-xl hover:bg-white/5 transition font-bold flex justify-between items-center"><span>الملف الشخصي</span> <span>👤</span></button>
+            <button @click="activeModal = 'about'; menuOpen = false" class="w-full text-right p-4 rounded-xl hover:bg-white/5 transition font-bold flex justify-between items-center"><span>من نحن</span> <span>ℹ️</span></button>
+            
+            <button @click="exportProject()" class="w-full text-right p-4 rounded-xl bg-green-600/10 text-green-400 border border-green-500/20 font-black flex justify-between items-center hover:bg-green-600 hover:text-white transition">
+                <span>تصدير كملف موقع</span> <span>📥</span>
+            </button>
+        </nav>
+        <div class="mt-auto text-center border-t border-white/5 pt-6 text-[9px] font-black text-gray-600 uppercase">صُنع بالسعودية 🇸🇦</div>
+    </div>
+
     <script>
+        function majalApp() {
+            return {
+                menuOpen: false, mode: 'easy', lang: 'ar', activeModal: null,
+                showSuggest: false, suggestPos: {x: 50, y: 150},
+                suggestions: ['عرف اسم_المحل = ""', 'عرف اللون = "blue"', '<button>زر</button>', '<div>حاوية</div>'],
+                
+                init() {
+                    // (الاقتراح 3) الحفظ التلقائي: استعادة الكود عند الفتح
+                    const saved = localStorage.getItem('majal_autosave');
+                    if(saved) {
+                        document.getElementById('majal-editor').value = saved;
+                        setTimeout(() => MajalCore.process(), 100);
+                    }
+                },
+                onInput(e) {
+                    const val = e.target.value;
+                    // (الاقتراح 3) حفظ تلقائي مع كل حرف
+                    localStorage.setItem('majal_autosave', val);
+                    MajalCore.process();
+
+                    // (الاقتراح 2) إظهار المقترحات عند كتابة حروف معينة في وضع السهل
+                    if(this.mode === 'easy') {
+                        const lastChar = val.slice(-1);
+                        this.showSuggest = (lastChar === 'ع' || lastChar === '<' || lastChar === '{');
+                    }
+                },
+                applySuggest(s) {
+                    const editor = document.getElementById('majal-editor');
+                    editor.value += s;
+                    this.showSuggest = false;
+                    MajalCore.process();
+                },
+                addSection(type) {
+                    const editor = document.getElementById('majal-editor');
+                    const sections = {
+                        header: '\n<header style="background:#0f172a; color:white; padding:20px; display:flex; justify-content:space-between; align-items:center; border-radius:15px;">\n  <h2 style="margin:0;">🛒 متجري</h2>\n  <nav>الرئيسية | المنتجات</nav>\n</header>',
+                        features: '\n<section style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;">\n  <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">⭐ جودة عالية</div>\n  <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">🚚 شحن سريع</div>\n</section>',
+                        footer: '\n<footer style="margin-top:30px; text-align:center; padding:20px; border-top:1px solid #eee; color:gray;">\n  كل الحقوق محفوظة © ٢٠٢٤\n</footer>'
+                    };
+                    editor.value += sections[type];
+                    MajalCore.process();
+                },
+                exportProject() {
+                    // (الاقتراح 4) تصدير المشروع كملف HTML
+                    const code = document.getElementById('live-canvas').innerHTML;
+                    const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif; direction:rtl;}</style></head><body>${code}</body></html>`;
+                    const blob = new Blob([fullHTML], {type: 'text/html'});
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'majal_project.html';
+                    a.click();
+                }
+            }
+        }
+
         const MajalCore = {
             registry: new Map(),
-            process: function() {
+            process() {
                 const code = document.getElementById('majal-editor').value;
                 const canvas = document.getElementById('live-canvas');
                 if(!code.trim()) { canvas.innerHTML = ''; return; }
@@ -111,9 +148,7 @@
                         if (parts[1]) this.registry.set(parts[0].trim(), parts[1].trim().replace(/['"]+/g, ''));
                     } else { htmlOutput += line + "\n"; }
                 });
-                this.registry.forEach((v, k) => {
-                    htmlOutput = htmlOutput.replace(new RegExp(`{${k}}`, 'g'), v);
-                });
+                this.registry.forEach((v, k) => htmlOutput = htmlOutput.replace(new RegExp(`{${k}}`, 'g'), v));
                 canvas.innerHTML = htmlOutput;
             }
         };
