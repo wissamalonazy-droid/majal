@@ -3,76 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مَجال PRO | المصنع المتكامل</title>
+<title>مَجال PRO | هندسة 50-25-25</title>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0d1117; --panel: #161b22; --border: #30363d;
-  --accent: #f5a623; --text: #c9d1d9;
+  --bg: #05070a; --panel: #0c0f16; --border: #1c2230;
+  --accent: #f5a623; --text: #d1d5db;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
 /* Header */
-.top-nav { height: 60px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; flex-shrink: 0; }
-.logo { font-size: 20px; font-weight: 900; color: var(--accent); }
-.btn-gen { background: var(--accent); color: #000; border: none; padding: 10px 25px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.3s; }
-.btn-gen:hover { transform: scale(1.05); }
+.top-nav { height: 55px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; flex-shrink: 0; }
+.logo { font-size: 18px; font-weight: 900; color: var(--accent); }
+.btn-run { background: var(--accent); color: #000; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; }
 
-/* Workspace Layout: 3 Columns */
-.workspace { display: grid; grid-template-columns: 300px 1fr 1fr; flex: 1; overflow: hidden; gap: 1px; background: var(--border); }
+/* ── Main Layout (Vertical Split) ── */
+.main-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
 
-/* Column 1: Input */
-.col { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
-.label { padding: 10px 15px; font-size: 11px; background: var(--panel); color: #8b949e; border-bottom: 1px solid var(--border); font-weight: bold; }
-#user-command { flex: 1; background: transparent; color: var(--accent); border: none; outline: none; padding: 20px; font-size: 16px; font-weight: bold; resize: none; line-height: 1.6; }
+/* Top Section (50%) - Live View */
+.top-section { height: 50%; background: #000; display: flex; justify-content: center; padding: 15px; border-bottom: 2px solid var(--border); background-image: radial-gradient(#1f2937 1px, transparent 1px); background-size: 20px 20px; }
+#live-preview-frame { width: 100%; max-width: 800px; background: #fff; border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
 
-/* Column 2: Generated Code */
-#generated-code { flex: 1; background: #050505; color: #7ee787; border: none; outline: none; padding: 20px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.5; resize: none; direction: ltr; text-align: left; }
+/* Bottom Section (50%) - Divided into 25% | 25% */
+.bottom-section { height: 50%; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
 
-/* Column 3: Live Preview */
-.preview-col { background: #f0f2f5; display: flex; justify-content: center; padding: 20px; overflow-y: auto; }
-#live-preview-frame { width: 100%; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; min-height: 500px; border: none; }
+.box { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
+.label { padding: 8px 15px; font-size: 10px; background: var(--panel); color: #8b949e; border-bottom: 1px solid var(--border); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
 
-.copy-btn { background: #30363d; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; margin-right: 10px; }
+#user-command { flex: 1; background: transparent; color: var(--accent); border: none; outline: none; padding: 20px; font-size: 18px; font-weight: 700; resize: none; line-height: 1.6; text-align: right; }
+#generated-code { flex: 1; background: #020202; color: #7ee787; border: none; outline: none; padding: 20px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.5; resize: none; direction: ltr; text-align: left; }
+
+.copy-btn { background: var(--border); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 </style>
 </head>
 <body>
 
 <header class="top-nav">
-  <div class="logo">مَجال PRO <span>| المصنع المتكامل v13</span></div>
-  <button class="btn-gen" onclick="processAll()">⚡ تنفيذ وبناء</button>
+  <div class="logo">مَجال PRO <span>| هندسة التقسيم v14</span></div>
+  <button class="btn-run" onclick="buildSovereign()">⚡ تشغيل وبناء</button>
 </header>
 
-<div class="workspace">
-  <div class="col" style="border-left: 1px solid var(--border);">
-    <div class="label">أمر البناء السيادي</div>
-    <textarea id="user-command" placeholder="مثال: متجر عطور ألوان أسود وذهبي"></textarea>
+<div class="main-layout">
+  
+  <div class="top-section">
+    <iframe id="live-preview-frame"></iframe>
   </div>
 
-  <div class="col">
-    <div class="label" style="display: flex; justify-content: space-between; align-items: center;">
-        كود المتجر المنتج
+  <div class="bottom-section">
+    
+    <div class="box">
+      <div class="label">خَانة الأوامر السيادية</div>
+      <textarea id="user-command" placeholder="اكتب هنا: متجر عطور ألوان أسود وأزرق"></textarea>
+    </div>
+
+    <div class="box">
+      <div class="label">
+        الكود المولد
         <button class="copy-btn" onclick="copyCode()">نسخ الكود</button>
+      </div>
+      <textarea id="generated-code" readonly>// الكود سيظهر هنا...</textarea>
     </div>
-    <textarea id="generated-code" readonly>// الكود سيظهر هنا...</textarea>
-  </div>
 
-  <div class="col">
-    <div class="label">شاشة العرض الحية</div>
-    <div class="preview-col">
-        <iframe id="live-preview-frame"></iframe>
-    </div>
   </div>
 </div>
 
 <script>
-function processAll() {
+function buildSovereign() {
   const input = document.getElementById('user-command').value.trim();
   if (!input.includes("متجر")) return;
 
-  // 1. استخراج البيانات (الاسم، الألوان، النشاط)
-  const storeName = input.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجري الخاص";
+  // استخراج البيانات
+  const storeName = input.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجر المضياني";
   
   const colors = {
     'أحمر': '#ef4444', 'أزرق': '#3b82f6', 'أصفر': '#facc15', 
@@ -97,38 +99,37 @@ function processAll() {
   let emoji = "📦";
   if(input.includes("عطر")) emoji = "🧴";
   if(input.includes("ساعة")) emoji = "⌚";
+  if(input.includes("كتاب") || input.includes("كتب")) emoji = "📚";
 
-  // 2. توليد الكود الصافي
-  const finalHTML = `<!DOCTYPE html>
+  const finalCode = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <style>
-    body { font-family: sans-serif; background: ${bg}; color: ${text}; margin: 0; padding: 0; transition: 0.3s; }
-    header { background: ${primary}; padding: 30px; text-align: center; color: ${primary === '#ffffff' ? '#000' : '#fff'}; }
-    .container { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .card { background: ${bg === '#000000' ? '#161b22' : '#f9f9f9'}; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid ${primary}22; }
-    button { background: ${primary}; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; }
-    .price { color: ${primary}; font-weight: 900; font-size: 1.2em; }
+    body { font-family: sans-serif; background: ${bg}; color: ${text}; margin: 0; padding: 0; }
+    header { background: ${primary}; padding: 40px 20px; text-align: center; color: ${primary === '#ffffff' ? '#000' : '#fff'}; }
+    .content { padding: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card { background: ${bg === '#000000' ? '#111' : '#f9f9f9'}; padding: 25px; border-radius: 25px; text-align: center; border: 1px solid ${primary}22; }
+    button { background: ${primary}; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer; }
+    .price { color: ${primary}; font-weight: 900; font-size: 24px; }
   </style>
 </head>
 <body>
   <header>
-    <h1 style="margin:0">${storeName}</h1>
-    <p style="opacity:0.8; font-size:12px;">متجر ذكي بني بواسطة مَجال PRO</p>
+    <h1 style="margin:0; font-size: 40px;">${storeName}</h1>
+    <p>تم البناء بواسطة مَجال PRO</p>
   </header>
-  <div class="container">
-    <div class="card"><div style="font-size:40px">${emoji}</div><h3>منتج 1</h3><p class="price">199 ريال</p><button>إضافة للسلة</button></div>
-    <div class="card"><div style="font-size:40px">${emoji}</div><h3>منتج 2</h3><p class="price">250 ريال</p><button>إضافة للسلة</button></div>
+  <div class="content">
+    <div class="card"><div style="font-size:60px">${emoji}</div><h2>منتج فاخر</h2><p class="price">250 ريال</p><button>أضف للسلة</button></div>
+    <div class="card"><div style="font-size:60px">${emoji}</div><h2>منتج ملكي</h2><p class="price">450 ريال</p><button>أضف للسلة</button></div>
   </div>
 </body>
 </html>`;
 
-  // 3. تحديث خانة الكود وشاشة العرض
-  document.getElementById('generated-code').value = finalHTML;
+  document.getElementById('generated-code').value = finalCode;
   const iframe = document.getElementById('live-preview-frame');
   iframe.contentWindow.document.open();
-  iframe.contentWindow.document.write(finalHTML);
+  iframe.contentWindow.document.write(finalCode);
   iframe.contentWindow.document.close();
 }
 
@@ -136,7 +137,7 @@ function copyCode() {
   const codeArea = document.getElementById('generated-code');
   codeArea.select();
   document.execCommand('copy');
-  alert("تم نسخ كود المتجر بنجاح!");
+  alert("تم نسخ الكود بنجاح!");
 }
 </script>
 </body>
