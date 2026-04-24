@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مَجال PRO | هندسة 50-25-25</title>
+<title>مَجال PRO | الدقة v15</title>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #05070a; --panel: #0c0f16; --border: #1c2230;
-  --accent: #f5a623; --text: #d1d5db;
-}
+:root { --bg: #05070a; --panel: #0c0f16; --border: #1c2230; --accent: #f5a623; --text: #d1d5db; }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
@@ -18,53 +15,39 @@ body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-s
 .logo { font-size: 18px; font-weight: 900; color: var(--accent); }
 .btn-run { background: var(--accent); color: #000; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; }
 
-/* ── Main Layout (Vertical Split) ── */
+/* Layout */
 .main-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-
-/* Top Section (50%) - Live View */
 .top-section { height: 50%; background: #000; display: flex; justify-content: center; padding: 15px; border-bottom: 2px solid var(--border); background-image: radial-gradient(#1f2937 1px, transparent 1px); background-size: 20px 20px; }
 #live-preview-frame { width: 100%; max-width: 800px; background: #fff; border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-
-/* Bottom Section (50%) - Divided into 25% | 25% */
 .bottom-section { height: 50%; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
-
 .box { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
 .label { padding: 8px 15px; font-size: 10px; background: var(--panel); color: #8b949e; border-bottom: 1px solid var(--border); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
-
 #user-command { flex: 1; background: transparent; color: var(--accent); border: none; outline: none; padding: 20px; font-size: 18px; font-weight: 700; resize: none; line-height: 1.6; text-align: right; }
 #generated-code { flex: 1; background: #020202; color: #7ee787; border: none; outline: none; padding: 20px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.5; resize: none; direction: ltr; text-align: left; }
-
 .copy-btn { background: var(--border); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 </style>
 </head>
 <body>
 
 <header class="top-nav">
-  <div class="logo">مَجال PRO <span>| هندسة التقسيم v14</span></div>
-  <button class="btn-run" onclick="buildSovereign()">⚡ تشغيل وبناء</button>
+  <div class="logo">مَجال PRO <span>| مُنتج الأكواد المطور</span></div>
+  <button class="btn-run" onclick="buildSovereign()">⚡ تنفيذ البناء</button>
 </header>
 
 <div class="main-layout">
-  
   <div class="top-section">
     <iframe id="live-preview-frame"></iframe>
   </div>
 
   <div class="bottom-section">
-    
     <div class="box">
-      <div class="label">خَانة الأوامر السيادية</div>
-      <textarea id="user-command" placeholder="اكتب هنا: متجر عطور ألوان أسود وأزرق"></textarea>
+      <div class="label">أمر المواصفات</div>
+      <textarea id="user-command" placeholder="مثال: متجر سديم لبيع العطور ألوان أسود وذهبي"></textarea>
     </div>
-
     <div class="box">
-      <div class="label">
-        الكود المولد
-        <button class="copy-btn" onclick="copyCode()">نسخ الكود</button>
-      </div>
-      <textarea id="generated-code" readonly>// الكود سيظهر هنا...</textarea>
+      <div class="label">الكود الصافي (Ready to Copy) <button class="copy-btn" onclick="copyCode()">نسخ</button></div>
+      <textarea id="generated-code" readonly></textarea>
     </div>
-
   </div>
 </div>
 
@@ -73,21 +56,23 @@ function buildSovereign() {
   const input = document.getElementById('user-command').value.trim();
   if (!input.includes("متجر")) return;
 
-  // استخراج البيانات
-  const storeName = input.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجر المضياني";
-  
+  // 1. استخراج اسم المتجر بدقة (الكلمة الملاصقة لـ متجر)
+  let storeName = input.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجري";
+
+  // 2. محرك الألوان المطور (يفحص كامل الجملة)
   const colors = {
-    'أحمر': '#ef4444', 'أزرق': '#3b82f6', 'أصفر': '#facc15', 
-    'أبيض': '#ffffff', 'أسود': '#000000', 'ذهبي': '#d4af37', 'بني': '#78350f'
+    'أحمر': '#ef4444', 'أزرق': '#2563eb', 'أزرق': '#2563eb', 'أصفر': '#facc15', 
+    'أبيض': '#ffffff', 'أسود': '#000000', 'ذهبي': '#d4af37', 'بني': '#78350f', 'رمادي': '#4b5563'
   };
 
-  let primary = '#3b82f6'; 
-  let bg = '#ffffff';
-  let text = '#000000';
+  let primary = '#3b82f6'; // لون الهوية الافتراضي
+  let bg = '#ffffff';      // خلفية افتراضية
+  let text = '#000000';    // نص افتراضي
 
+  // فحص الألوان المذكورة في النص وتوزيعها
   Object.keys(colors).forEach(c => {
-    if(input.includes(c)) {
-      if(c === 'أسود' || c === 'أبيض') {
+    if (input.includes(c)) {
+      if (c === 'أسود' || c === 'أبيض') {
         bg = colors[c];
         text = (c === 'أسود') ? '#ffffff' : '#000000';
       } else {
@@ -96,32 +81,35 @@ function buildSovereign() {
     }
   });
 
-  let emoji = "📦";
-  if(input.includes("عطر")) emoji = "🧴";
-  if(input.includes("ساعة")) emoji = "⌚";
-  if(input.includes("كتاب") || input.includes("كتب")) emoji = "📚";
+  // 3. تحديد الأيقونة
+  let icon = "📦";
+  if(input.includes("عطر")) icon = "🧴";
+  if(input.includes("ساعة")) icon = "⌚";
+  if(input.includes("كتاب") || input.includes("كتب")) icon = "📚";
 
+  // 4. توليد الكود النظيف (بدون الجملة الزائدة)
   const finalCode = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <style>
-    body { font-family: sans-serif; background: ${bg}; color: ${text}; margin: 0; padding: 0; }
-    header { background: ${primary}; padding: 40px 20px; text-align: center; color: ${primary === '#ffffff' ? '#000' : '#fff'}; }
-    .content { padding: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .card { background: ${bg === '#000000' ? '#111' : '#f9f9f9'}; padding: 25px; border-radius: 25px; text-align: center; border: 1px solid ${primary}22; }
-    button { background: ${primary}; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer; }
-    .price { color: ${primary}; font-weight: 900; font-size: 24px; }
+    body { font-family: 'Tajawal', sans-serif; background: ${bg}; color: ${text}; margin: 0; padding: 0; }
+    header { background: ${primary}; padding: 50px 20px; text-align: center; color: ${bg === '#000000' && primary === '#000000' ? '#fff' : (primary === '#ffffff' ? '#000' : '#fff')}; }
+    .shop-name { font-size: 45px; font-weight: 900; margin: 0; }
+    .grid { padding: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
+    .card { background: ${bg === '#000000' ? '#111' : '#f9f9f9'}; padding: 25px; border-radius: 30px; text-align: center; border: 1px solid ${primary}33; transition: 0.3s; }
+    .card:hover { transform: translateY(-5px); border-color: ${primary}; }
+    .price { color: ${primary}; font-weight: 900; font-size: 24px; margin: 10px 0; }
+    button { background: ${primary}; color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
   </style>
 </head>
 <body>
   <header>
-    <h1 style="margin:0; font-size: 40px;">${storeName}</h1>
-    <p>تم البناء بواسطة مَجال PRO</p>
+    <h1 class="shop-name">${storeName}</h1>
   </header>
-  <div class="content">
-    <div class="card"><div style="font-size:60px">${emoji}</div><h2>منتج فاخر</h2><p class="price">250 ريال</p><button>أضف للسلة</button></div>
-    <div class="card"><div style="font-size:60px">${emoji}</div><h2>منتج ملكي</h2><p class="price">450 ريال</p><button>أضف للسلة</button></div>
+  <div class="grid">
+    <div class="card"><div style="font-size:70px">${icon}</div><h2>منتج ملكي</h2><p class="price">299 ريال</p><button>أضف للسلة</button></div>
+    <div class="card"><div style="font-size:70px">${icon}</div><h2>منتج فاخر</h2><p class="price">450 ريال</p><button>أضف للسلة</button></div>
   </div>
 </body>
 </html>`;
@@ -137,7 +125,7 @@ function copyCode() {
   const codeArea = document.getElementById('generated-code');
   codeArea.select();
   document.execCommand('copy');
-  alert("تم نسخ الكود بنجاح!");
+  alert("تم نسخ الكود السيادي بنجاح!");
 }
 </script>
 </body>
