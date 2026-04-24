@@ -3,165 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مَجال PRO | الإصدار السيادي v10</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<title>مَجال PRO | Code Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #05070a; --panel: #0c0f16; --border: #1c2230;
-  --text: #d1d5db; --amber: #f5a623; --blue: #3b82f6; --white: #ffffff;
+  --bg: #0d1117; --panel: #161b22; --border: #30363d;
+  --accent: #f5a623; --text: #c9d1d9;
 }
-
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
 /* Header */
-.header { height: 60px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; flex-shrink: 0; }
-.logo { font-size: 20px; font-weight: 900; color: var(--amber); display: flex; align-items: center; gap: 10px; }
-.logo span { color: #fff; font-weight: 300; font-size: 14px; }
-.run-btn { background: var(--amber); color: #000; border: none; padding: 10px 25px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(245,166,35,0.2); }
-.run-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,166,35,0.4); }
+.top-nav { height: 60px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
+.logo { font-size: 20px; font-weight: 900; color: var(--accent); }
+.btn-gen { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; }
 
-/* Workspace Layout */
-.main { display: grid; grid-template-columns: 1fr 1fr; flex: 1; overflow: hidden; gap: 1px; background: var(--border); }
+/* Workspace */
+.workspace { display: grid; grid-template-columns: 1fr 1fr; flex: 1; overflow: hidden; gap: 2px; background: var(--border); }
 
-/* Editor Side */
-.editor-container { background: var(--bg); display: flex; flex-direction: column; position: relative; overflow: hidden; }
-.editor-hdr { padding: 10px 20px; font-size: 11px; color: #4b5563; border-bottom: 1px solid var(--border); background: var(--panel); }
-.editor-wrapper { flex: 1; display: flex; position: relative; overflow: auto; }
-#line-numbers { width: 45px; padding: 20px 0; text-align: center; color: #374151; font-family: 'IBM Plex Mono', monospace; border-left: 1px solid var(--border); background: var(--panel); user-select: none; font-size: 13px; line-height: 1.8; }
-.code-input-area { flex: 1; position: relative; }
-#editor { width: 100%; height: 100%; background: transparent; color: transparent; caret-color: var(--amber); border: none; outline: none; padding: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.8; resize: none; white-space: pre; position: absolute; z-index: 2; direction: ltr; text-align: left; }
-#highlight { width: 100%; height: 100%; padding: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; line-height: 1.8; white-space: pre; position: absolute; z-index: 1; pointer-events: none; color: #9ca3af; direction: ltr; text-align: left; }
+/* Input Side */
+.input-side { background: var(--bg); display: flex; flex-direction: column; }
+.label { padding: 10px 20px; font-size: 11px; background: var(--panel); color: #8b949e; border-bottom: 1px solid var(--border); }
+#user-command { flex: 1; background: transparent; color: var(--accent); border: none; outline: none; padding: 25px; font-size: 18px; font-weight: bold; resize: none; line-height: 1.6; }
 
-/* Shop Preview Side */
-.preview-container { background: #f3f4f6; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-#shop-viewport { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+/* Output Side (The Generated Code) */
+.output-side { background: #000; display: flex; flex-direction: column; }
+#generated-code { flex: 1; background: #050505; color: #7ee787; border: none; outline: none; padding: 25px; font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.5; resize: none; white-space: pre; overflow: auto; direction: ltr; text-align: left; }
 
-/* Generated Store Components */
-.store-wrapper { width: 100%; max-width: 400px; background: #fff; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); overflow: hidden; min-height: 600px; display: flex; flex-direction: column; }
-.store-nav { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f3f4f6; }
-.store-hero { padding: 40px 20px; text-align: center; }
-.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-.p-card { background: #f9fafb; padding: 15px; border-radius: 20px; text-align: center; border: 1px solid #f1f5f9; }
-.p-img { font-size: 40px; margin-bottom: 10px; }
-.p-btn { width: 100%; padding: 10px; border-radius: 12px; border: none; color: #fff; font-weight: 700; margin-top: 10px; cursor: pointer; }
-
-/* Highlight Colors */
-.hl-kw { color: var(--amber); font-weight: bold; }
-.hl-str { color: #10b981; }
-.hl-num { color: #8b5cf6; }
+.copy-btn { background: #30363d; color: #fff; border: none; padding: 5px 15px; border-radius: 5px; font-size: 11px; cursor: pointer; position: absolute; top: 70px; left: 20px; z-index: 10; }
 </style>
 </head>
-<body x-data="majalApp()">
+<body>
 
-<header class="header">
-  <div class="logo">مَجال <span>| محرك بناء المتاجر v10</span></div>
-  <div id="stats" style="font-size: 10px; color: #4b5563;">جاهز للأوامر السيادية</div>
-  <button class="run-btn" onclick="runBuild()">▶ بناء المتجر الآن</button>
+<header class="top-nav">
+  <div class="logo">مَجال PRO <span>| مصنع الأكواد</span></div>
+  <button class="btn-gen" onclick="generateCode()">⚡ إنتاج كود المتجر</button>
 </header>
 
-<main class="main">
-  <div class="editor-container">
-    <div class="editor-hdr">main.mjl - المحرر الذكي</div>
-    <div class="editor-wrapper">
-      <div id="line-numbers">1</div>
-      <div class="code-input-area">
-        <div id="highlight"></div>
-        <textarea id="editor" spellcheck="false" oninput="updateView()">متجر سديم لبيع العطور ألوان أسود وذهبي</textarea>
-      </div>
-    </div>
+<div class="workspace">
+  <div class="input-side">
+    <div class="label">أدخل مواصفات المتجر (النوع + الألوان)</div>
+    <textarea id="user-command" placeholder="مثال: متجر سديم لبيع العطور ألوان أسود وذهبي"></textarea>
   </div>
 
-  <div class="preview-container">
-    <div id="shop-viewport">
-      <div style="color: #9ca3af; margin-top: 200px; text-align: center;">
-        <div style="font-size: 40px; margin-bottom: 20px;">🏗️</div>
-        أكتب مواصفات متجرك ثم اضغط بناء
-      </div>
-    </div>
+  <div class="output-side" style="position: relative;">
+    <div class="label">كود HTML/CSS الجاهز للنسخ</div>
+    <button class="copy-btn" onclick="copyToClipboard()">نسخ الكود</button>
+    <textarea id="generated-code" readonly>// الكود المنتج سيظهر هنا...</textarea>
   </div>
-</main>
+</div>
 
 <script>
-const editor = document.getElementById('editor');
-const highlight = document.getElementById('highlight');
-const lineNumbers = document.getElementById('line-numbers');
-const viewport = document.getElementById('shop-viewport');
-
-function updateView() {
-  const code = editor.value;
-  // Syntax Highlighting
-  highlight.innerHTML = code.replace(/"([^"]*)"/g, '<span class="hl-str">"$1"</span>')
-                            .replace(/\b(متجر|بيع|ألوان|لون)\b/g, '<span class="hl-kw">$1</span>')
-                            .replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');
-  
-  // Line Numbers
-  const lines = code.split('\n').length;
-  lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
-  
-  highlight.scrollTop = editor.scrollTop;
-  highlight.scrollLeft = editor.scrollLeft;
-}
-
-function runBuild() {
-  const input = editor.value.trim();
+function generateCode() {
+  const input = document.getElementById('user-command').value.trim();
   if (!input.includes("متجر")) return;
 
-  const start = performance.now();
-
-  // محرك التحليل الدقيق
-  let storeName = input.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجر المضياني";
+  // استخراج البيانات
+  const storeName = input.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجري الخاص";
   
-  const colorMap = {
-    'أحمر': '#ef4444', 'أزرق': '#3b82f6', 'أصفر': '#facc15', 'أبيض': '#ffffff', 
-    'أسود': '#0f172a', 'ذهبي': '#d4af37', 'بني': '#78350f'
+  const colors = {
+    'أحمر': '#ef4444', 'أزرق': '#3b82f6', 'أصفر': '#facc15', 
+    'أبيض': '#ffffff', 'أسود': '#000000', 'ذهبي': '#d4af37', 'بني': '#78350f'
   };
-  
-  let primary = '#3b82f6';
+
+  let primary = '#3b82f6'; 
   let bg = '#ffffff';
-  
-  Object.keys(colorMap).forEach(key => {
-    if (input.includes(key)) {
-      if (key === 'أسود' || key === 'أبيض') bg = colorMap[key];
-      else primary = colorMap[key];
+  let text = '#000000';
+
+  Object.keys(colors).forEach(c => {
+    if(input.includes(c)) {
+      if(c === 'أسود' || c === 'أبيض') {
+        bg = colors[c];
+        text = (c === 'أسود') ? '#ffffff' : '#000000';
+      } else {
+        primary = colors[c];
+      }
     }
   });
 
   let emoji = "📦";
-  if (input.includes("عطر")) emoji = "🧴";
-  if (input.includes("كتاب") || input.includes("كتب")) emoji = "📚";
-  if (input.includes("ساعة")) emoji = "⌚";
+  if(input.includes("عطر")) emoji = "🧴";
+  if(input.includes("ساعة")) emoji = "⌚";
 
-  // بناء الهيكل البصري
-  viewport.innerHTML = `
-    <div class="store-wrapper" style="background: ${bg}; color: ${bg==='#0f172a'?'#fff':'#000'}">
-      <nav class="store-nav" style="border-bottom-color: ${primary}22">
-        <div style="font-weight: 900; color: ${primary}">${storeName}</div>
-        <div style="font-size: 20px;">🛒</div>
-      </nav>
-      <div class="store-hero" style="background: ${primary}; color: ${primary==='#ffffff'?'#000':'#fff'}">
-        <h1 style="font-size: 32px; font-weight: 900; margin-bottom: 10px;">${storeName}</h1>
-        <p style="opacity: 0.8; font-size: 12px; font-weight: bold; letter-spacing: 2px;">أهلاً بك في عالم الفخامة</p>
-      </div>
-      <div class="product-grid">
-        ${[1, 2, 3, 4].map(i => `
-          <div class="p-card" style="background: ${bg==='#0f172a'?'#1c2230':'#f9fafb'}; border-color: ${primary}11">
-            <div class="p-img">${emoji}</div>
-            <div style="font-size: 14px; font-weight: 900; margin-bottom: 5px;">منتج ${i}</div>
-            <div style="font-size: 12px; color: ${primary}; font-weight: bold;">150 ريال</div>
-            <button class="p-btn" style="background: ${primary}">أضف للسلّة</button>
-          </div>
-        `).join('')}
-      </div>
+  // توليد كود HTML كامل
+  const finalCode = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>${storeName}</title>
+  <style>
+    body { font-family: sans-serif; background: ${bg}; color: ${text}; margin: 0; padding: 0; }
+    header { background: ${primary}; padding: 20px; text-align: center; color: #fff; }
+    .container { padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .product-card { background: ${bg === '#000000' ? '#111' : '#f9f9f9'}; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid ${primary}22; }
+    .price { color: ${primary}; font-weight: bold; font-size: 20px; }
+    button { background: ${primary}; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>${storeName}</h1>
+    <p>أهلاً بك في متجرنا</p>
+  </header>
+  <div class="container">
+    <div class="product-card">
+      <div style="font-size: 50px;">${emoji}</div>
+      <h3>منتج مميز</h3>
+      <p class="price">150 ريال</p>
+      <button>إضافة للسلة</button>
     </div>
-  `;
+    </div>
+</body>
+</html>`;
 
-  const end = performance.now();
-  document.getElementById('stats').innerText = `تم البناء في ${(end-start).toFixed(2)} مللي ثانية | الدقة: 100%`;
+  document.getElementById('generated-code').value = finalCode;
 }
 
-// Init
-updateView();
+function copyToClipboard() {
+  const codeArea = document.getElementById('generated-code');
+  codeArea.select();
+  document.execCommand('copy');
+  alert("تم نسخ الكود بنجاح!");
+}
 </script>
 </body>
 </html>
