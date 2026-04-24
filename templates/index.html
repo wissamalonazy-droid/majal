@@ -3,129 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مَجال PRO | الدقة v15</title>
+<title>مَجال PRO | الهندسة الدقيقة v17</title>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root { --bg: #05070a; --panel: #0c0f16; --border: #1c2230; --accent: #f5a623; --text: #d1d5db; }
+:root { --sys-bg: #030508; --sys-panel: #0a0d14; --sys-border: #1a1f2b; --sys-accent: #f5a623; }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+body { background: var(--sys-bg); color: #d1d5db; font-family: 'Tajawal', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-/* Header */
-.top-nav { height: 55px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; flex-shrink: 0; }
-.logo { font-size: 18px; font-weight: 900; color: var(--accent); }
-.btn-run { background: var(--accent); color: #000; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+/* الهيدر */
+.top-nav { height: 55px; background: var(--sys-panel); border-bottom: 1px solid var(--sys-border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; flex-shrink: 0; }
+.logo { font-size: 18px; font-weight: 900; color: var(--sys-accent); letter-spacing: -1px; }
+.btn-build { background: var(--sys-accent); color: #000; border: none; padding: 8px 30px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.2s; }
+.btn-build:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(245,166,35,0.3); }
 
-/* Layout */
-.main-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-.top-section { height: 50%; background: #000; display: flex; justify-content: center; padding: 15px; border-bottom: 2px solid var(--border); background-image: radial-gradient(#1f2937 1px, transparent 1px); background-size: 20px 20px; }
-#live-preview-frame { width: 100%; max-width: 800px; background: #fff; border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-.bottom-section { height: 50%; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
-.box { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
-.label { padding: 8px 15px; font-size: 10px; background: var(--panel); color: #8b949e; border-bottom: 1px solid var(--border); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
-#user-command { flex: 1; background: transparent; color: var(--accent); border: none; outline: none; padding: 20px; font-size: 18px; font-weight: 700; resize: none; line-height: 1.6; text-align: right; }
-#generated-code { flex: 1; background: #020202; color: #7ee787; border: none; outline: none; padding: 20px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.5; resize: none; direction: ltr; text-align: left; }
-.copy-btn { background: var(--border); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 9px; cursor: pointer; }
+/* التقسيم الهندسي: 50% عرض | 25% أوامر | 25% كود */
+.layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.view-area { height: 50%; background: #000; display: flex; justify-content: center; padding: 15px; border-bottom: 2px solid var(--sys-border); }
+#preview-frame { width: 100%; max-width: 950px; background: #fff; border-radius: 15px; border: none; box-shadow: 0 15px 50px rgba(0,0,0,0.6); }
+
+.control-area { height: 50%; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--sys-border); }
+.pane { background: var(--sys-bg); display: flex; flex-direction: column; overflow: hidden; }
+.pane-label { padding: 8px 15px; font-size: 10px; background: var(--sys-panel); color: #6b7280; border-bottom: 1px solid var(--sys-border); font-weight: 900; display: flex; justify-content: space-between; }
+
+#input-command { flex: 1; background: transparent; color: var(--sys-accent); border: none; outline: none; padding: 20px; font-size: 17px; font-weight: 700; resize: none; line-height: 1.6; }
+#code-output { flex: 1; background: #010204; color: #7ee787; border: none; outline: none; padding: 20px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.5; resize: none; direction: ltr; text-align: left; }
 </style>
 </head>
 <body>
 
 <header class="top-nav">
-  <div class="logo">مَجال PRO <span>| مُنتج الأكواد المطور</span></div>
-  <button class="btn-run" onclick="buildSovereign()">⚡ تنفيذ البناء</button>
+  <div class="logo">مَجال PRO <span>| مفسر الهندسة v17</span></div>
+  <button class="btn-build" onclick="buildExact()">⚡ بناء المواصفات بالملي</button>
 </header>
 
-<div class="main-layout">
-  <div class="top-section">
-    <iframe id="live-preview-frame"></iframe>
+<div class="layout">
+  <div class="view-area">
+    <iframe id="preview-frame"></iframe>
   </div>
 
-  <div class="bottom-section">
-    <div class="box">
-      <div class="label">أمر المواصفات</div>
-      <textarea id="user-command" placeholder="مثال: متجر سديم لبيع العطور ألوان أسود وذهبي"></textarea>
+  <div class="control-area">
+    <div class="pane" style="border-left: 1px solid var(--sys-border);">
+      <div class="pane-label">التفاصيل الهندسية (اكتب كل شيء بالتفصيل)</div>
+      <textarea id="input-command" placeholder="مثال: متجر سديم، الألوان أسود وذهبي، الحواف دائرية جداً، 3 منتجات في السطر"></textarea>
     </div>
-    <div class="box">
-      <div class="label">الكود الصافي (Ready to Copy) <button class="copy-btn" onclick="copyCode()">نسخ</button></div>
-      <textarea id="generated-code" readonly></textarea>
+    <div class="pane">
+      <div class="pane-label">الكود الهندسي الناتج <button onclick="copyCode()" style="background:none; border:none; color:var(--sys-accent); cursor:pointer;">[نسخ]</button></div>
+      <textarea id="code-output" readonly></textarea>
     </div>
   </div>
 </div>
 
 <script>
-function buildSovereign() {
-  const input = document.getElementById('user-command').value.trim();
-  if (!input.includes("متجر")) return;
+function buildExact() {
+  const prompt = document.getElementById('input-command').value.trim();
+  if (!prompt) return;
 
-  // 1. استخراج اسم المتجر بدقة (الكلمة الملاصقة لـ متجر)
-  let storeName = input.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجري";
+  // --- محرك تحليل المواصفات (The Specs Engine) ---
+  
+  // 1. الاسم
+  const name = prompt.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجر جديد";
 
-  // 2. محرك الألوان المطور (يفحص كامل الجملة)
-  const colors = {
-    'أحمر': '#ef4444', 'أزرق': '#2563eb', 'أزرق': '#2563eb', 'أصفر': '#facc15', 
-    'أبيض': '#ffffff', 'أسود': '#000000', 'ذهبي': '#d4af37', 'بني': '#78350f', 'رمادي': '#4b5563'
-  };
-
-  let primary = '#3b82f6'; // لون الهوية الافتراضي
-  let bg = '#ffffff';      // خلفية افتراضية
-  let text = '#000000';    // نص افتراضي
-
-  // فحص الألوان المذكورة في النص وتوزيعها
+  // 2. الألوان (تحليل دقيق)
+  const colors = {'أسود':'#000','أبيض':'#fff','ذهبي':'#d4af37','فضي':'#c0c0c0','أزرق':'#2563eb','أحمر':'#e11d48','بني':'#78350f'};
+  let bg = '#ffffff', primary = '#2563eb', text = '#000';
+  
   Object.keys(colors).forEach(c => {
-    if (input.includes(c)) {
-      if (c === 'أسود' || c === 'أبيض') {
-        bg = colors[c];
-        text = (c === 'أسود') ? '#ffffff' : '#000000';
-      } else {
-        primary = colors[c];
-      }
+    if (prompt.includes(c)) {
+      if (c === 'أسود') { bg = '#000'; text = '#fff'; }
+      else if (c === 'أبيض') { bg = '#fff'; text = '#000'; }
+      else { primary = colors[c]; }
     }
   });
 
-  // 3. تحديد الأيقونة
-  let icon = "📦";
-  if(input.includes("عطر")) icon = "🧴";
-  if(input.includes("ساعة")) icon = "⌚";
-  if(input.includes("كتاب") || input.includes("كتب")) icon = "📚";
+  // 3. الحواف (Border Radius)
+  let radius = "10px";
+  if (prompt.includes("دائرية جدا")) radius = "40px";
+  if (prompt.includes("حادة")) radius = "0px";
 
-  // 4. توليد الكود النظيف (بدون الجملة الزائدة)
-  const finalCode = `<!DOCTYPE html>
+  // 4. التوزيع (Grid Columns)
+  let cols = "1fr 1fr";
+  if (prompt.includes("3 منتجات")) cols = "1fr 1fr 1fr";
+  if (prompt.includes("منتج واحد")) cols = "1fr";
+
+  // 5. الأيقونات
+  let emoji = "📦";
+  if (prompt.includes("عطر")) emoji = "🧴";
+  if (prompt.includes("ساعة")) emoji = "⌚";
+
+  // --- توليد الكود النظيف ---
+  const html = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <style>
     body { font-family: 'Tajawal', sans-serif; background: ${bg}; color: ${text}; margin: 0; padding: 0; }
-    header { background: ${primary}; padding: 50px 20px; text-align: center; color: ${bg === '#000000' && primary === '#000000' ? '#fff' : (primary === '#ffffff' ? '#000' : '#fff')}; }
-    .shop-name { font-size: 45px; font-weight: 900; margin: 0; }
-    .grid { padding: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
-    .card { background: ${bg === '#000000' ? '#111' : '#f9f9f9'}; padding: 25px; border-radius: 30px; text-align: center; border: 1px solid ${primary}33; transition: 0.3s; }
-    .card:hover { transform: translateY(-5px); border-color: ${primary}; }
-    .price { color: ${primary}; font-weight: 900; font-size: 24px; margin: 10px 0; }
-    button { background: ${primary}; color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
+    header { background: ${primary}; padding: 60px 20px; text-align: center; color: ${primary==='#fff'?'#000':'#fff'}; }
+    .store-name { font-size: 50px; font-weight: 900; margin: 0; letter-spacing: -2px; }
+    .grid { display: grid; grid-template-columns: ${cols}; gap: 20px; padding: 30px; max-width: 1200px; margin: 0 auto; }
+    .item { background: ${bg==='#000'?'#111111':'#f8f8f8'}; border: 1px solid ${primary}44; border-radius: ${radius}; padding: 30px; text-align: center; transition: 0.3s; }
+    .item:hover { border-color: ${primary}; transform: translateY(-5px); }
+    .price { color: ${primary}; font-weight: 900; font-size: 26px; margin: 15px 0; }
+    button { background: ${primary}; color: white; border: none; padding: 15px; border-radius: ${radius === '40px' ? '20px' : radius}; width: 100%; font-weight: 900; cursor: pointer; font-size: 16px; }
   </style>
 </head>
 <body>
-  <header>
-    <h1 class="shop-name">${storeName}</h1>
-  </header>
+  <header><h1 class="store-name">${name}</h1></header>
   <div class="grid">
-    <div class="card"><div style="font-size:70px">${icon}</div><h2>منتج ملكي</h2><p class="price">299 ريال</p><button>أضف للسلة</button></div>
-    <div class="card"><div style="font-size:70px">${icon}</div><h2>منتج فاخر</h2><p class="price">450 ريال</p><button>أضف للسلة</button></div>
+    ${[1,2,3,4,5,6].slice(0, prompt.includes("3 منتجات") ? 6 : 4).map(i => `
+    <div class="item">
+      <div style="font-size: 60px;">${emoji}</div>
+      <h3 style="margin: 10px 0;">منتج فاخر ${i}</h3>
+      <div class="price">350 ريال</div>
+      <button>شراء الآن</button>
+    </div>`).join('')}
   </div>
 </body>
 </html>`;
 
-  document.getElementById('generated-code').value = finalCode;
-  const iframe = document.getElementById('live-preview-frame');
-  iframe.contentWindow.document.open();
-  iframe.contentWindow.document.write(finalCode);
-  iframe.contentWindow.document.close();
+  document.getElementById('code-output').value = html;
+  const frame = document.getElementById('preview-frame');
+  frame.contentWindow.document.open();
+  frame.contentWindow.document.write(html);
+  frame.contentWindow.document.close();
 }
 
 function copyCode() {
-  const codeArea = document.getElementById('generated-code');
-  codeArea.select();
-  document.execCommand('copy');
-  alert("تم نسخ الكود السيادي بنجاح!");
+  const copyText = document.getElementById("code-output");
+  copyText.select();
+  document.execCommand("copy");
+  alert("تم نسخ الكود الهندسي!");
 }
 </script>
 </body>
