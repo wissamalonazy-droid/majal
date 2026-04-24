@@ -2,107 +2,97 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>MAJAL PRO | AUTO-GEN ENGINE</title>
+    <title>MAJAL PRO | COMMAND ENGINE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap" rel="stylesheet">
     <style>
         html, body { height: 100%; margin: 0; overflow: hidden; background-color: #020617; color: white; font-family: 'Tajawal', sans-serif; }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        #majal-editor { font-family: 'monospace'; background: transparent; border: none; outline: none; resize: none; color: #60a5fa; font-size: 20px; width: 100%; height: 100%; padding: 40px; font-weight: bold; }
-        #live-canvas { background: #f8fafc; color: #000; border-radius: 30px; width: 100%; height: 100%; overflow: auto; border: 4px solid #1e293b; transition: all 0.5s ease; }
-        [x-cloak] { display: none !important; }
+        #majal-editor { font-family: 'monospace'; background: transparent; border: none; outline: none; resize: none; color: #93c5fd; font-size: 20px; width: 100%; height: 100%; padding: 40px; }
+        #live-canvas { background: #fff; border-radius: 30px; width: 100%; height: 100%; overflow: auto; border: 4px solid #1e293b; }
     </style>
 </head>
 <body x-data="majalApp()" x-init="init()">
 
-    <header class="h-[70px] flex items-center justify-between px-10 bg-black/40 border-b border-white/5 z-50">
-        <div class="flex items-center gap-6">
-            <h1 class="text-2xl font-black italic text-blue-500 tracking-tighter">MAJAL <span class="text-white font-light text-sm italic">GEN-ENGINE</span></h1>
-        </div>
-        <div class="bg-blue-600/10 text-blue-400 px-4 py-1 rounded-full text-[10px] font-black border border-blue-500/20 uppercase tracking-widest animate-pulse">
-            Ready for Command
+    <header class="h-[65px] flex items-center justify-between px-10 bg-black/40 border-b border-white/5 z-50 shadow-2xl">
+        <h1 class="text-2xl font-black italic text-blue-500 tracking-tighter">MAJAL <span class="text-white font-light text-sm italic">COMMAND CORE</span></h1>
+        <div class="flex gap-4 items-center">
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">وضع البرو: مفعل</span>
+            <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
         </div>
     </header>
 
-    <main class="flex flex-col h-[calc(100vh-70px)] p-6 gap-6">
+    <main class="flex flex-col h-[calc(100vh-65px)] p-6 gap-6">
         <div class="flex-1 glass rounded-[40px] flex flex-col overflow-hidden shadow-2xl border border-blue-500/10">
-            <div class="px-8 py-3 bg-white/5 border-b border-white/5 flex justify-between items-center text-[11px] font-black text-blue-400 uppercase tracking-widest">
-                <span>أمر البناء الذكي</span>
+            <div class="px-8 py-3 bg-white/5 border-b border-white/5 flex justify-between items-center text-[10px] font-black text-blue-400">
+                <span>اكتب المواصفات (مثال: متجر بيع اشتراكات ألوان أبيض أصفر أزرق)</span>
             </div>
-            <textarea id="majal-editor" @input="onInput($event)" placeholder="مثال: متجر عطور"></textarea>
+            <textarea id="majal-editor" @input="onInput($event)" placeholder="اكتب أمر البناء هنا..."></textarea>
         </div>
 
-        <div class="flex-1 glass rounded-[40px] flex flex-col overflow-hidden shadow-2xl">
-            <div id="live-canvas" class="p-0">
-                <div class="flex items-center justify-center h-full text-gray-400 italic">
-                    في انتظار أمر البناء...
-                </div>
-            </div>
+        <div class="flex-1 glass rounded-[40px] flex flex-col overflow-hidden">
+            <div id="live-canvas"></div>
         </div>
     </main>
 
     <script>
         function majalApp() {
             return {
-                init() {
-                    const saved = localStorage.getItem('majal_gen_v5');
-                    if(saved) { document.getElementById('majal-editor').value = saved; this.generate(); }
-                },
-                onInput(e) {
-                    localStorage.setItem('majal_gen_v5', e.target.value);
-                    this.generate();
-                },
+                init() { this.generate(); },
+                onInput() { this.generate(); },
                 generate() {
-                    const cmd = document.getElementById('majal-editor').value.trim();
+                    const input = document.getElementById('majal-editor').value;
                     const canvas = document.getElementById('live-canvas');
                     
-                    if (cmd.includes("متجر عطور")) {
-                        canvas.innerHTML = `
-                            <div class="min-h-full bg-stone-50 p-8 text-right" dir="rtl">
-                                <nav class="flex justify-between items-center mb-12 border-b pb-6 border-stone-200">
-                                    <h2 class="text-2xl font-serif font-black tracking-widest text-stone-800 uppercase">SADEEM PERFUMES</h2>
-                                    <div class="flex gap-6 text-sm font-bold text-stone-500"><span>الرئيسية</span><span>المجموعة</span><span>سلة المشتريات (0)</span></div>
-                                </nav>
-                                <div class="bg-stone-800 rounded-[40px] p-12 text-white mb-10 relative overflow-hidden">
-                                    <h1 class="text-5xl font-black mb-4">عالم الفخامة</h1>
-                                    <p class="opacity-70 max-w-md">أرقى العطور المستوحاة من الطبيعة والسيادة.</p>
-                                    <button class="mt-8 bg-white text-black px-10 py-4 rounded-full font-black">تسوق الآن</button>
-                                </div>
-                                <div class="grid grid-cols-3 gap-6">
-                                    ${[1,2,3].map(i => `<div class="bg-white p-4 rounded-[30px] shadow-sm border border-stone-100 hover:shadow-xl transition">
-                                        <div class="h-48 bg-stone-100 rounded-[20px] mb-4 flex items-center justify-center text-4xl">🧴</div>
-                                        <h3 class="font-black text-lg">عطر سديم رقم ${i}</h3>
-                                        <p class="text-stone-400 text-sm mb-4 font-bold">رائحة تدوم طويلاً</p>
-                                        <div class="flex justify-between items-center"><span class="font-black text-stone-800">450 ريال</span><button class="bg-stone-800 text-white p-3 rounded-xl">🛒</button></div>
-                                    </div>`).join('')}
-                                </div>
-                            </div>`;
-                    } else if (cmd.includes("متجر اشتراكات") || cmd.includes("متجر لبيع الاشتراكات")) {
-                        canvas.innerHTML = `
-                            <div class="min-h-full bg-slate-900 p-8 text-right text-white" dir="rtl">
-                                <nav class="flex justify-between items-center mb-16">
-                                    <h2 class="text-2xl font-black text-blue-500 italic">SUBS PRO</h2>
-                                    <button class="bg-blue-600 px-6 py-2 rounded-full font-bold">تسجيل دخول</button>
-                                </nav>
-                                <div class="text-center mb-16">
-                                    <h1 class="text-5xl font-black mb-6">فعل اشتراكك بضغطة زر</h1>
-                                    <p class="text-slate-400">توصيل فوري لجميع أنواع الاشتراكات الرقمية.</p>
-                                </div>
-                                <div class="grid grid-cols-3 gap-8">
-                                    ${['نيتفليكس', 'شاهد', 'يوتيوب برو'].map(item => `
-                                        <div class="bg-slate-800 p-8 rounded-[40px] border border-slate-700 hover:border-blue-500 transition-all group">
-                                            <div class="text-4xl mb-6">⚡</div>
-                                            <h3 class="font-black text-2xl mb-2">${item}</h3>
-                                            <p class="text-slate-500 mb-6 text-sm font-bold">اشتراك شهر كامل - ضمان ذهبي</p>
-                                            <div class="text-3xl font-black text-blue-400 mb-8">29 ريال</div>
-                                            <button class="w-full bg-blue-600 py-4 rounded-2xl font-black group-hover:bg-blue-500">شراء الآن</button>
-                                        </div>`).join('')}
-                                </div>
-                            </div>`;
-                    } else if (cmd !== "") {
-                        canvas.innerHTML = `<div class="flex items-center justify-center h-full text-blue-600 font-bold animate-pulse">جاري تحليل المتجر وبناء العناصر السيادية...</div>`;
+                    if (!input.includes("متجر")) {
+                        canvas.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 italic">اكتب "متجر" لتبدأ السحر...</div>`;
+                        return;
                     }
+
+                    // نظام تحليل الألوان الذكي
+                    const colors = {
+                        bg: input.includes("أبيض") ? "#ffffff" : (input.includes("أسود") ? "#0f172a" : "#f8fafc"),
+                        primary: input.includes("أصفر") ? "#facc15" : (input.includes("أزرق") ? "#2563eb" : "#1e293b"),
+                        secondary: input.includes("أزرق") ? "#3b82f6" : "#64748b",
+                        text: input.includes("أسود") || input.includes("أزرق") ? "#ffffff" : "#0f172a"
+                    };
+
+                    // تحليل نوع النشاط
+                    let type = "عام";
+                    let items = ["منتج 1", "منتج 2", "منتج 3"];
+                    if (input.includes("اشتراكات")) {
+                        type = "اشتراكات رقمية ⚡";
+                        items = ["يوتيوب بريميوم", "نيتفليكس شهر", "شاهد VIP"];
+                    } else if (input.includes("عطور")) {
+                        type = "عطور فاخرة 🧴";
+                        items = ["سديم 1", "سديم 2", "سديم 3"];
+                    }
+
+                    canvas.innerHTML = `
+                        <div style="background: ${colors.bg}; color: ${input.includes("أسود") ? '#fff' : '#000'}; min-height: 100%; transition: 0.5s;" dir="rtl" class="p-8">
+                            <nav class="flex justify-between items-center mb-10 border-b pb-6" style="border-color: ${colors.primary}44">
+                                <h2 class="text-2xl font-black" style="color: ${colors.primary}">مَجال | ${type}</h2>
+                                <div class="flex gap-4 font-bold text-sm"><span>الرئيسية</span><span>السلة</span></div>
+                            </nav>
+                            
+                            <div class="rounded-[40px] p-10 mb-10 text-center shadow-2xl" style="background: ${colors.primary}; color: ${colors.text}">
+                                <h1 class="text-4xl font-black mb-4 italic">أهلاً بك في متجرك السيادي</h1>
+                                <p class="opacity-90 font-medium">أفضل وجهة لـ ${type} بكل سهولة وأمان.</p>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-6">
+                                ${items.map(item => `
+                                    <div class="bg-white p-6 rounded-[30px] border shadow-sm hover:shadow-xl transition-all" style="border-color: ${colors.primary}22">
+                                        <div class="h-32 rounded-2xl mb-4 flex items-center justify-center text-3xl" style="background: ${colors.bg === '#ffffff' ? '#f1f5f9' : '#1e293b'}">📦</div>
+                                        <h3 class="font-black text-xl mb-2" style="color: #0f172a">${item}</h3>
+                                        <p class="text-gray-400 text-xs font-bold mb-6 italic">منتج أصلي ومضمون 100%</p>
+                                        <button class="w-full py-4 rounded-2xl font-black transition text-white" style="background: ${colors.primary}">شراء الآن</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
                 }
             }
         }
