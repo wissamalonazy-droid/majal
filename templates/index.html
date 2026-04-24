@@ -1,99 +1,137 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مَجال | نسخة الإصلاح v30</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-    :root { --sys-bg: #05070a; --sys-accent: #f5a623; --sys-panel: #0c0f16; }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background: var(--sys-bg); color: #fff; font-family: 'Tajawal', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-    /* الهيدر */
-    header { height: 60px; background: var(--sys-panel); border-bottom: 1px solid #1c2230; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; }
-    .logo { font-size: 18px; font-weight: 900; color: var(--sys-accent); }
-    .btn-run { background: var(--sys-accent); color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: 900; cursor: pointer; }
-
-    /* تقسيم الشاشة: معاينة فوق - تحكم تحت */
-    .container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-    #preview { height: 50%; background: #fff; border: none; width: 100%; }
-    
-    .editor { height: 50%; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1c2230; border-top: 2px solid #1c2230; }
-    .pane { background: var(--sys-bg); display: flex; flex-direction: column; }
-    .label { padding: 8px 15px; font-size: 10px; background: var(--sys-panel); color: #4b5563; border-bottom: 1px solid #1c2230; font-weight: 800; }
-    
-    #user-in { flex: 1; background: transparent; color: var(--sys-accent); border: none; outline: none; padding: 15px; font-size: 16px; font-weight: 700; resize: none; text-align: right; }
-    #code-out { flex: 1; background: #000; color: #7ee787; border: none; outline: none; padding: 15px; font-family: monospace; font-size: 11px; direction: ltr; }
-</style>
-</head>
-<body>
-
-<header>
-    <div class="logo">مَجال <span style="opacity:0.5; font-size:10px;">FIX v30</span></div>
-    <button class="btn-run" onclick="startBuild()">⚡ تنفيذ البناء</button>
-</header>
-
-<div class="container">
-    <iframe id="preview"></iframe>
-    <div class="editor">
-        <div class="pane">
-            <div class="label">أمر البناء والروابط</div>
-            <textarea id="user-in">متجر المضياني لبيع العطور ألوان أسود وذهبي ورابط الصورة https://images.unsplash.com/photo-1541643600914-78b084683601?w=500</textarea>
-        </div>
-        <div class="pane">
-            <div class="label">الكود المصدر المولد</div>
-            <textarea id="code-out" readonly></textarea>
-        </div>
-    </div>
-</div>
+<!-- MAJAL v2 FULL (مختصر لأهم الأجزاء المطورة) -->
 
 <script>
-function startBuild() {
-    const input = document.getElementById('user-in').value;
-    
-    // 1. استخراج البيانات (إصلاح المحرك)
-    const storeName = input.match(/متجر\s+([\u0621-\u064A0-9]+)/)?.[1] || "متجر جديد";
-    const urlMatch = input.match(/https?:\/\/[^\s]+/);
-    const imgUrl = urlMatch ? urlMatch[0] : "";
-    
-    // الألوان
-    let bg = input.includes('أسود') ? '#000000' : '#ffffff';
-    let primary = input.includes('ذهبي') ? '#d4af37' : '#2563eb';
-    let text = bg === '#000000' ? '#ffffff' : '#000000';
 
-    // 2. بناء الكود (إصلاح التفاعل)
-    const html = `
-    <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
-    <head>
-      <meta charset="UTF-8">
-      <style>
-        body { font-family: 'Tajawal', sans-serif; background: ${bg}; color: ${text}; margin: 0; text-align: center; }
-        header { 
-            background: ${imgUrl ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${imgUrl}')` : primary};
-            background-size: cover; background-position: center;
-            padding: 80px 20px; color: #fff; 
+// =============================
+// 🆕 ORDER SYSTEM
+// =============================
+let ORDER_ID = 1000;
+
+class Interpreter {
+  constructor() {
+    this.out = [];
+    this.orders = [];
+    this.global = new Env();
+    this._setupBuiltins();
+  }
+
+  execBuiltinCall(node, env) {
+    const args = node.args.map(a => this.eval(a, env));
+
+    switch(node.kind) {
+
+      // =============================
+      // 🆕 ADD TO CART (unchanged)
+      // =============================
+      case 'Add': {
+        const [cart, prod, qty=1] = args;
+        cart._items.push({ prod, qty });
+        this.emit(`🛒 ${prod.اسم} × ${qty}`, 'ok');
+        return;
+      }
+
+      // =============================
+      // 🔥 NEW CHECKOUT SYSTEM
+      // =============================
+      case 'Checkout': {
+        const [cart] = args;
+
+        let total = 0;
+
+        for (const item of cart._items) {
+          if (item.prod.مخزون < item.qty) {
+            throw new Error(`المخزون غير كافٍ: ${item.prod.اسم}`);
+          }
+
+          const sub = item.prod.سعر * item.qty;
+          total += sub;
+
+          // 🆕 خصم المخزون
+          item.prod.مخزون -= item.qty;
         }
-        .btn { background: ${primary}; color: #fff; border: none; padding: 15px 30px; border-radius: 10px; font-weight: 900; margin-top: 20px; cursor: pointer; }
-      </style>
-    </head>
-    <body>
-      <header><h1>${storeName}</h1></header>
-      <div style="padding: 40px;">
-        <h2>أهلاً بك في متجرنا</h2>
-        <p>تصميم سيادي تم بناؤه بالملي متر</p>
-        <button class="btn">اطلب الآن</button>
-      </div>
-    </body>
-    </html>`;
 
-    document.getElementById('code-out').value = html;
-    const frame = document.getElementById('preview');
-    frame.contentWindow.document.open();
-    frame.contentWindow.document.write(html);
-    frame.contentWindow.document.close();
+        const order = {
+          id: ++ORDER_ID,
+          total,
+          items: cart._items,
+          status: "تم"
+        };
+
+        this.orders.push(order);
+
+        this.emit(`🧾 طلب رقم #${order.id}`, 'sec');
+        this.emit(`💰 الإجمالي: ${total}`, 'price');
+
+        return order;
+      }
+
+      // =============================
+      // ⭐ REVIEWS SYSTEM
+      // =============================
+      case 'Rate': {
+        const [prod, stars, comment] = args;
+
+        if (!prod.تقييمات) prod.تقييمات = [];
+
+        prod.تقييمات.push({ stars, comment });
+
+        this.emit(`⭐ تقييم ${stars}/5 على ${prod.اسم}`, 'ok');
+        return;
+      }
+
+      // =============================
+      // 📊 REPORT (improved)
+      // =============================
+      case 'Report': {
+        const [obj] = args;
+
+        this.emit(`📊 تقرير`, 'sec');
+
+        if (obj._type === 'cart') {
+          let total = 0;
+
+          for (const item of obj._items) {
+            const sub = item.qty * item.prod.سعر;
+            total += sub;
+
+            this.emit(`${item.prod.اسم} × ${item.qty} = ${sub}`, 'val');
+          }
+
+          this.emit(`الإجمالي: ${total}`, 'price');
+        }
+
+        return;
+      }
+    }
+  }
+
 }
+
+// =============================
+// 🆕 TRY / CATCH SUPPORT
+// =============================
+Parser.prototype.parseTry = function() {
+  this.advance(); // حاول
+  const tryBlock = this.parseBlock();
+
+  this.expect('امسك');
+  const catchBlock = this.parseBlock();
+
+  return { type:'Try', tryBlock, catchBlock };
+};
+
+Interpreter.prototype.exec = function(node, env) {
+
+  if (node.type === 'Try') {
+    try {
+      this.execBlock(node.tryBlock.body, env);
+    } catch (e) {
+      this.execBlock(node.catchBlock.body, env);
+    }
+    return;
+  }
+
+  return this._execOriginal(node, env);
+};
+
 </script>
-</body>
-</html>
