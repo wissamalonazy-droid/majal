@@ -1,189 +1,104 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<title>Majal v2 FIXED</title>
+import os, hashlib, re, urllib.request
 
-<style>
-:root {
-  --ink:#0d0f14;
-  --text:#d4daf0;
-  --card:#181c26;
-  --amber:#f5a623;
-  --line:#1f2535;
-}
+class NXCEngine:
+    """
+    NEXA Sovereign Engine - Version 1.0 (Golden Build)
+    Created by: Wissam (NEXA Founder)
+    """
+    def __init__(self):
+        self.key_file = "key.nx"
+        self.storage = {}         # البيانات العامة
+        self.vault = {}           # البيانات المشفرة
+        self.original_data = {}   # مخزن السيادة (للفك)
+        self.types = {}           # نظام الأنواع الصارم
+        self.vault_mode = False
+        self._boot_system()
 
-* {margin:0;padding:0;box-sizing:border-box;}
+    def _boot_system(self):
+        # التأكد من وجود المفتاح السيادي
+        if not os.path.exists(self.key_file):
+            with open(self.key_file, "w") as f: 
+                f.write("NEXA_9922_ORIGINAL")
+        
+        # التحقق الصامت من هوية المفتاح
+        with open(self.key_file, "r") as f:
+            if f.read().strip() != "NEXA_9922_ORIGINAL":
+                print("\n[NXC]: SECURITY COMPROMISED. SYSTEM LOCKDOWN.")
+                exit()
 
-body{
-  background:var(--ink);
-  color:var(--text);
-  font-family:monospace;
-}
+    def execute(self, script):
+        lines = script.split('\n')
+        for i, line in enumerate(lines, 1):
+            line = line.strip()
+            if not line or line.startswith("//"): continue
 
-textarea{
-  width:100%;
-  height:40vh;
-  background:#111;
-  color:#fff;
-  padding:10px;
-}
+            # 1. أمر الكشف السيادي (Reveal)
+            if line.startswith("reveal vault:"):
+                v_name = re.search(r'vault:\s*"(.*)"', line).group(1)
+                print(f"\n--- [NXC]: ACCESS GRANTED TO '{v_name}' ---")
+                for k, v in self.original_data.items():
+                    print(f"[UNLOCKED]: {k} -> {v}")
+                continue
 
-button{
-  padding:10px;
-  background:var(--amber);
-  border:none;
-  cursor:pointer;
-}
+            # 2. أمر الجسر (Bridge)
+            if line.startswith("bridge"):
+                url = re.search(r'->\s*"(.*)"', line).group(1)
+                try:
+                    with urllib.request.urlopen(url) as res:
+                        self.storage["bridge_data"] = res.read().decode('utf-8')[:50]
+                        print(f"[NXC]: Bridge established. Data captured.")
+                except: print(f"[NXC]: Bridge failed.")
+                continue
 
-#out{
-  background:#000;
-  padding:10px;
-  min-height:200px;
-}
-</style>
-</head>
+            # 3. إدارة الخزانات (Vault Mode)
+            if "open vault:" in line: self.vault_mode = True; continue
+            if line == "}": self.vault_mode = False; continue
 
-<body>
+            # 4. معالجة المتغيرات والسهم (Set & Arrow)
+            if "set" in line:
+                if "->" not in line:
+                    print(f"[NXC]: Flow broken at line {i}. Where is the Arrow?"); continue
+                
+                parts = re.match(r'set\s+(\w+)\s*->\s*(.*)', line)
+                if parts:
+                    name, val = parts.groups()
+                    val = val.strip().strip('"')
+                    
+                    # استنتاج النوع (Qadr للارقام، Bayan للنصوص)
+                    inf_type = "Qadr" if val.isdigit() else "Bayan"
+                    
+                    if name in self.types and self.types[name] != inf_type:
+                        print(f"[NEXA]: Type violation at line {i}. Respect the Types!"); continue
 
-<textarea id="code">
-// مثال جاهز
+                    if self.vault_mode:
+                        self.vault[name] = hashlib.sha256(val.encode()).hexdigest()[:12]
+                        self.original_data[name] = val
+                    else:
+                        self.storage[name] = val
+                    self.types[name] = inf_type
 
-منتج عطر {
-  اسم: "فاخر"
-  سعر: 500
-  مخزون: 2
-}
+            # 5. الطباعة (Output)
+            elif "io.say" in line:
+                target = re.search(r'\((.*)\)', line).group(1)
+                if target in self.vault:
+                    print(f"[NEXA]: Logic violation. Respect the Vault! (Access Denied)")
+                else:
+                    print(f"NX_Output: {self.storage.get(target, target)}")
 
-سلة طلب {}
-
-أضف(طلب, عطر, 1)
-
-حاول {
-  اشتري(طلب)
-} امسك {
-  أطبع("فشل")
-}
-
-قيّم(عطر, 5, "جبار")
-</textarea>
-
-<button onclick="run()">تشغيل</button>
-
-<div id="out"></div>
-
-<script>
-
-// ================== TOKENS ==================
-const KEYWORDS = [
-'منتج','سلة','عميل','خصم','إذا','وإلا',
-'أضف','اشتري','أطبع',
-'حاول','امسك','قيّم'
-];
-
-// ================== LEXER بسيط ==================
-function tokenize(code){
-  return code.split(/\s+/).filter(Boolean);
-}
-
-// ================== Interpreter بسيط ==================
-let env = {};
-let output = [];
-
-function print(msg){
-  output.push(msg);
-}
-
-function run(){
-  output=[];
-  env={};
-  const code=document.getElementById("code").value;
-
-  try{
-    exec(code);
-  }catch(e){
-    print("❌ "+e.message);
-  }
-
-  document.getElementById("out").innerHTML=
-    output.map(x=>"<div>"+x+"</div>").join("");
-}
-
-// ================== EXEC ==================
-function exec(code){
-
-  // منتج
-  code.replace(/منتج\s+(\w+)\s*{([^}]*)}/g,(m,name,body)=>{
-    let obj={type:"product",reviews:[]};
-
-    body.split("\n").forEach(line=>{
-      let [k,v]=line.split(":");
-      if(!k)return;
-      obj[k.trim()] = isNaN(v) ? v.replace(/"/g,'').trim() : Number(v);
-    });
-
-    env[name]=obj;
-    print("📦 "+name);
-  });
-
-  // سلة
-  code.replace(/سلة\s+(\w+)/g,(m,name)=>{
-    env[name]={type:"cart",items:[]};
-    print("🛒 "+name);
-  });
-
-  // أضف
-  code.replace(/أضف\(([^)]+)\)/g,(m,args)=>{
-    let [c,p,q]=args.split(",").map(x=>x.trim());
-    env[c].items.push({p:env[p],q:Number(q)});
-    print("➕ "+p);
-  });
-
-  // حاول / امسك
-  if(code.includes("حاول")){
-    try{
-      exec(code.split("حاول")[1].split("امسك")[0]);
-    }catch(e){
-      exec(code.split("امسك")[1]);
+# --- مثال تشغيلي جاهز للعرض ---
+if __name__ == "__main__":
+    nexa = NXCEngine()
+    demo_script = """
+    set store -> "NEXA LUXURY"
+    
+    open vault: "Security_Core" -> {
+        set adminPass -> 998877
+        set clientInfo -> "Confidential Data"
     }
-  }
-
-  // اشتري
-  code.replace(/اشتري\(([^)]+)\)/g,(m,arg)=>{
-    let cart=env[arg.trim()];
-    let total=0;
-
-    cart.items.forEach(i=>{
-      if(i.p.مخزون < i.q){
-        throw new Error("نفذ المخزون");
-      }
-
-      i.p.مخزون -= i.q;
-      total += i.p.سعر * i.q;
-    });
-
-    print("💳 تم الشراء: "+total);
-  });
-
-  // قيّم
-  code.replace(/قيّم\(([^)]+)\)/g,(m,args)=>{
-    let [p,s,c]=args.split(",");
-    env[p.trim()].reviews.push({
-      stars:Number(s),
-      comment:c.replace(/"/g,'')
-    });
-
-    print("⭐ تم التقييم");
-  });
-
-  // أطبع
-  code.replace(/أطبع\(([^)]+)\)/g,(m,arg)=>{
-    print(arg.replace(/"/g,''));
-  });
-
-}
-
-</script>
-
-</body>
-</html>
+    
+    io.say(store)
+    io.say(adminPass) // سيتم رفض الوصول هنا
+    
+    reveal vault: "Security_Core" // سيتم الفتح هنا (للمالك فقط)
+    """
+    nexa.execute(demo_script)
